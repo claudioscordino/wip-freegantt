@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/">
+	<file>images/add.png</file>
+	<file>images/close.png</file>
+	<file>images/document-save.svg</file>
+	<file>images/document-save-as.svg</file>
+	<file>images/open.png</file>
+	<file>images/edit.png</file>
+	<file>images/showGrid.png</file>
+	<file>images/statusWindow.png</file>
+	<file>images/remove.png</file>
+	<file>images/configurations.png</file>
+	<file>images/document-new.svg</file>
+	<file>images/document-open.svg</file>
+	<file>images/document-open-recent.png</file>
+	<file>images/exit.svg</file>
+	<file>images/edit-delete.svg</file>
+	<file>images/splash1.png</file>
+	<file>images/splash2.jpg</file>
+	<file>images/arrow_down_normal.svg</file>
+	<file>images/arrow_up_normal.svg</file>
+	<file>images/go-up.svg</file>
+	<file>images/go-down.svg</file>
+	<file>images/gantt-hi.png</file>
+	<file>images/list-remove.svg</file>
+	<file>images/im-kick-user.png</file>
+	<file>images/im-user.png</file>
+	<file>images/im-user-offline.png</file>
+	<file>images/preferences-desktop.svg</file>
+	<file>images/go-next.png</file>
+	<file>images/go-previous.png</file>
+    </qresource>
+</RCC>

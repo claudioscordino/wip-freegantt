@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+<svg
+   width="48pt"
+   height="48pt"
+   viewBox="0 0 256 256"
+   overflow="visible"
+   enable-background="new 0 0 256 256"
+   xml:space="preserve"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xml="http://www.w3.org/XML/1998/namespace"
+   xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   id="svg153"
+   sodipodi:version="0.32pre"
+   sodipodi:docname="/home/cschalle/gnome-themes-extras/Lush/icons/scalable/stock/stock_quit.svg"
+   sodipodi:docbase="/home/cschalle/gnome-themes-extras/Lush/icons/scalable/stock">
+  <defs
+     id="defs178" />
+  <sodipodi:namedview
+     id="base" />
+  <g
+     id="Layer_1"
+     stroke="#000000">
+    <path
+       fill="none"
+       stroke="none"
+       d="M256,256H0V0h256V256z"
+       id="path155" />
+  </g>
+  <g
+     id="Layer_2"
+     stroke="#000000">
+    <path
+       fill="#990000"
+       stroke="none"
+       d="M10.235,129.628c0,64.711,52.646,117.357,117.357,117.357S244.95,194.339,244.95,129.628    c0-64.711-52.646-117.358-117.357-117.358S10.235,64.917,10.235,129.628z"
+       id="path157" />
+    <linearGradient
+       id="XMLID_1_"
+       gradientUnits="userSpaceOnUse"
+       x1="127.5923"
+       y1="21.0103"
+       x2="127.5923"
+       y2="274.0162">
+      <stop
+         offset="0"
+         style="stop-color:#FF3333"
+         id="stop159" />
+      <stop
+         offset="1"
+         style="stop-color:#CC0000"
+         id="stop160" />
+      
+      
+      
+    </linearGradient>
+    <path
+       fill="url(#XMLID_1_)"
+       stroke="none"
+       d="M13.235,129.628c0,63.158,51.199,114.357,114.357,114.357    S241.95,192.786,241.95,129.628S190.751,15.27,127.593,15.27S13.235,66.47,13.235,129.628z"
+       id="path164" />
+    <path
+       opacity="0.7"
+       fill="#FFFFFF"
+       stroke="none"
+       d="M16.235,133.643c0-63.158,51.199-114.358,114.357-114.358    c36.628,0,69.23,17.222,90.16,44.007c-20.735-29.068-54.733-48.022-93.16-48.022c-63.158,0-114.357,51.2-114.357,114.358    c0,26.53,9.037,50.947,24.196,70.349C24.087,181.27,16.235,158.373,16.235,133.643z"
+       id="path165" />
+    <path
+       fill="#990000"
+       stroke="none"
+       d="M38.235,129.628c0,49.271,40.086,89.357,89.357,89.357s89.357-40.086,89.357-89.357    c0-49.272-40.086-89.358-89.357-89.358S38.235,80.355,38.235,129.628z"
+       id="path166" />
+    <linearGradient
+       id="XMLID_2_"
+       gradientUnits="userSpaceOnUse"
+       x1="41.2354"
+       y1="129.627"
+       x2="213.9502"
+       y2="129.627">
+      <stop
+         offset="0"
+         style="stop-color:#FFFFFF"
+         id="stop168" />
+      <stop
+         offset="1"
+         style="stop-color:#EFDBD9"
+         id="stop169" />
+      
+      
+      
+    </linearGradient>
+    <path
+       fill="url(#XMLID_2_)"
+       stroke="none"
+       d="M41.235,129.628c0,47.617,38.74,86.357,86.357,86.357    c47.617,0,86.357-38.74,86.357-86.357c0-47.618-38.74-86.358-86.357-86.358C79.975,43.27,41.235,82.01,41.235,129.628z"
+       id="path173" />
+    <path
+       opacity="0.2"
+       fill="#FFFFFF"
+       stroke="none"
+       d="M192.713,68.507c15.021,15.994,24.237,37.5,24.237,61.121    c0,49.271-40.086,89.357-89.357,89.357c-23.621,0-45.126-9.217-61.12-24.237c16.312,17.369,39.469,28.237,65.12,28.237    c49.271,0,89.357-40.086,89.357-89.357C220.95,107.977,210.082,84.818,192.713,68.507z"
+       id="path174" />
+    <path
+       fill="#990000"
+       stroke="none"
+       d="M105,79.534v97.599c0,9.646,9.883,17.201,22.5,17.201c12.618,0,22.5-7.556,22.5-17.201    V79.534c0-9.645-9.883-17.2-22.5-17.2C114.883,62.333,105,69.889,105,79.534z"
+       id="path175" />
+    <path
+       fill="#F63134"
+       stroke="none"
+       d="M145,177.133c0,6.738-7.836,12.201-17.5,12.201c-9.666,0-17.5-5.463-17.5-12.201V79.534    c0-6.738,7.834-12.2,17.5-12.2c9.665,0,17.5,5.462,17.5,12.2V177.133z"
+       id="path176" />
+  </g>
+</svg>
