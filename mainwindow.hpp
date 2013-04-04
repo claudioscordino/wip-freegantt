@@ -28,6 +28,8 @@ public:
 private:
 
     Project* project_;
+    QTableWidget* taskTable_;
+    QTableWidget* resourceTable_;
 
     Ui::MainWindow *ui;
 
@@ -68,12 +70,18 @@ private:
 
     void createMainMenu();
     void createMainToolbar();
-    void projectExisting();
-    void projectNotExisting();
-    bool loadFile(QString filename){return true;}
+    void enableDisableMenu();
+    bool loadFile(const std::string& filename){
+        return project_->loadFile(filename);
+    }
 
     void createResourceTab();
     void createTaskTab();
+
+protected:
+    inline void closeEvent(QCloseEvent* ){
+        exitClicked();
+    }
 
 private slots:
     bool saveProject();
@@ -82,14 +90,10 @@ private slots:
     bool saveClicked(){return true;}
     void openClicked();
     void aboutClicked();
-    void switchToTaskView();
-    void switchToResourceView();
-    void switchTab(int pos);
-
-protected:
-    void closeEvent(QCloseEvent* event){exitClicked();}
-
-
+    void switchTab(int tab);
+    void switchToTaskTab();
+    void switchToResourceTab();
+    void newTaskSlot();
 };
 
 #endif // MAINWINDOW_HPP

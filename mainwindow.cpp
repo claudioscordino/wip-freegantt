@@ -15,72 +15,85 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
+    project_(0),
+    taskTable_(0),
+    resourceTable_(0),
     ui(new Ui::MainWindow),
-    tab(this),
-    project_(0)
+    tab(this)
 {
     ui->setupUi(this);
     createMainMenu();
     createMainToolbar();
-    projectNotExisting();
+    enableDisableMenu();
 
     setWindowIcon(QIcon(":/images/gantt-hi.png"));
-    setWindowTitle("FreeGantt 0.1");
+    setWindowTitle("FreeGantt 0.2");
 
     connect(&tab, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
-    //connect(&tab, SIGNAL(currentChanged(1)), this, SLOT(switchToTaskView()));
-
+    connect(newTaskAction, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
 }
 
 //========== TAB ===========================
 
-void MainWindow::switchToResourceView()
+
+void MainWindow::newTaskSlot()
 {
-    tab.setCurrentIndex(0);
-    newTaskAction->setEnabled(false);
-    deleteTaskAction->setEnabled(false);
-    newResourceAction->setEnabled(true);
-    deleteResourceAction->setEnabled(true);
-    viewResourceAction->setEnabled(false);
-    viewTaskAction->setEnabled(true);
+       project_->addTask("New task");
+       // TODO: update taskTable_;
+
 }
 
-void MainWindow::switchToTaskView()
+
+void MainWindow::switchToResourceTab()
 {
-    tab.setCurrentIndex(1);
-    newTaskAction->setEnabled(true);
-    deleteTaskAction->setEnabled(true);
-    newResourceAction->setEnabled(false);
-    deleteResourceAction->setEnabled(false);
-    viewResourceAction->setEnabled(true);
-    viewTaskAction->setEnabled(false);
+        tab.setCurrentIndex(0);
+        newTaskAction->setEnabled(false);
+        deleteTaskAction->setEnabled(false);
+        newResourceAction->setEnabled(true);
+        deleteResourceAction->setEnabled(true);
+        viewResourceAction->setEnabled(false);
+        viewTaskAction->setEnabled(true);
 }
 
-void MainWindow::switchTab(int position)
+void MainWindow::switchToTaskTab()
 {
-    if (position == 0)
-	switchToResourceView();
+        tab.setCurrentIndex(1);
+        newTaskAction->setEnabled(true);
+        deleteTaskAction->setEnabled(true);
+        newResourceAction->setEnabled(false);
+        deleteResourceAction->setEnabled(false);
+        viewResourceAction->setEnabled(true);
+        viewTaskAction->setEnabled(false);
+}
+
+// 0 = Resources; 1 = Tasks
+void MainWindow::switchTab(int tab_nb)
+{
+    if (tab_nb == 0)
+        switchToResourceTab();
     else
-	switchToTaskView();
+        switchToTaskTab();
 }
 
 
 void MainWindow::createTaskTab()
 {
-    // Create right table:
+    // Create left table:
     int numberOfColumns = 3;
-    QTableWidget* taskTable = new QTableWidget(1, 3);
+    taskTable_ = new QTableWidget(0, 3);
     QStringList labels;
     labels.append("Task");
     labels.append("Begin");
     labels.append("End");
-    taskTable->setHorizontalHeaderLabels(labels);
-    taskTable->verticalHeader()->setVisible(false);
-    taskTable->setMinimumWidth(numberOfColumns * 70);
-    taskTable->setMaximumWidth(numberOfColumns * 70);
-    taskTable->setColumnWidth(0, 68);
-    taskTable->setColumnWidth(1, 68);
-    taskTable->setColumnWidth(2, 68);
+    taskTable_->setHorizontalHeaderLabels(labels);
+    taskTable_->verticalHeader()->setVisible(false);
+    taskTable_->setMinimumWidth(numberOfColumns * 70);
+    taskTable_->setMaximumWidth(numberOfColumns * 70);
+
+    // Set width of the three columns:
+    taskTable_->setColumnWidth(0, 68);
+    taskTable_->setColumnWidth(1, 68);
+    taskTable_->setColumnWidth(2, 68);
 
     // Create left scene:
     QGraphicsScene* taskScene = new QGraphicsScene(this);
@@ -92,7 +105,14 @@ void MainWindow::createTaskTab()
 
     QToolBar* taskToolbar = addToolBar(tr("&Task toolbar"));
 
-    deindentTaskAction= new QAction(tr("&Indent"), this);
+
+    taskToolbar->addAction(newTaskAction);
+    taskToolbar->addAction(deleteTaskAction);
+    taskToolbar->addSeparator();
+
+    taskToolbar->setBaseSize(numberOfColumns * 70, 20);
+
+    deindentTaskAction= new QAction(tr("&Deindent"), this);
     deindentTaskAction->setIcon(QIcon(":images/go-previous.png"));
     taskToolbar->addAction(deindentTaskAction);
 
@@ -100,15 +120,9 @@ void MainWindow::createTaskTab()
     indentTaskAction->setIcon(QIcon(":images/go-next.png"));
     taskToolbar->addAction(indentTaskAction);
 
-    taskToolbar->addSeparator();
-    taskToolbar->addAction(newTaskAction);
-    taskToolbar->addAction(deleteTaskAction);
-
-    taskToolbar->setBaseSize(numberOfColumns * 70, 20);
-
     QVBoxLayout* taskLeftLayout = new QVBoxLayout();
     taskLeftLayout->addWidget(taskToolbar);
-    taskLeftLayout->addWidget(taskTable);
+    taskLeftLayout->addWidget(taskTable_);
     taskLeftLayout->setSpacing(0);
     taskLeftLayout->setMargin(0);
     taskLeftLayout->setContentsMargins(0, 0, 0, 0);
@@ -140,19 +154,18 @@ void MainWindow::createTaskTab()
 
 void MainWindow::createResourceTab()
 {
-
-    // Create right table:
+    // Create left table:
     int numberOfColumns = 2;
-    QTableWidget* resourceTable = new QTableWidget(1, 2);
+    resourceTable_ = new QTableWidget(0, 2);
     QStringList labels;
     labels.append("Name");
     labels.append("Job");
-    resourceTable->setHorizontalHeaderLabels(labels);
-    resourceTable->verticalHeader()->setVisible(false);
-    resourceTable->setMinimumWidth(numberOfColumns * 70);
-    resourceTable->setMaximumWidth(numberOfColumns * 70);
-    resourceTable->setColumnWidth(0, 68);
-    resourceTable->setColumnWidth(1, 68);
+    resourceTable_->setHorizontalHeaderLabels(labels);
+    resourceTable_->verticalHeader()->setVisible(false);
+    resourceTable_->setMinimumWidth(numberOfColumns * 70);
+    resourceTable_->setMaximumWidth(numberOfColumns * 70);
+    resourceTable_->setColumnWidth(0, 68);
+    resourceTable_->setColumnWidth(1, 68);
 
     // Create left scene:
     QGraphicsScene* resourceScene = new QGraphicsScene(this);
@@ -170,7 +183,7 @@ void MainWindow::createResourceTab()
 
     QVBoxLayout* resourceLeftLayout = new QVBoxLayout();
     resourceLeftLayout->addWidget(resourceToolbar);
-    resourceLeftLayout->addWidget(resourceTable);
+    resourceLeftLayout->addWidget(resourceTable_);
     resourceLeftLayout->setSpacing(0);
     resourceLeftLayout->setMargin(0);
     resourceLeftLayout->setContentsMargins(0, 0, 0, 0);
@@ -182,7 +195,7 @@ void MainWindow::createResourceTab()
 
     // Create a layout (HBox) to contain table + scene:
     QHBoxLayout* resourcePageLayout = new QHBoxLayout();
-    //layout->addWidget(resourceTable);
+    //layout->addWidget(resourceTable_);
     resourcePageLayout->addWidget(resourceLeftContent);
     resourcePageLayout->addWidget(resourceView);
     resourcePageLayout->setSpacing(0);
@@ -274,12 +287,12 @@ void MainWindow::createMainMenu()
     viewResourceAction = new QAction(tr("&View Resources"), this);
     viewResourceAction->setIcon(QIcon(":images/im-user-offline.png"));
     viewMenu->addAction(viewResourceAction);
-    connect(viewResourceAction, SIGNAL(triggered()), this, SLOT(switchToResourceView()));
+    connect(viewResourceAction, SIGNAL(triggered()), this, SLOT(switchToResourceTab()));
 
     viewTaskAction = new QAction(tr("&View Tasks"), this);
     viewTaskAction->setIcon(QIcon(":images/showGrid.png"));
     viewMenu->addAction(viewTaskAction);
-    connect(viewTaskAction, SIGNAL(triggered()), this, SLOT(switchToTaskView()));
+    connect(viewTaskAction, SIGNAL(triggered()), this, SLOT(switchToTaskTab()));
 
     menuBar()->addSeparator();
 
@@ -290,24 +303,21 @@ void MainWindow::createMainMenu()
     aboutMenu->addAction(aboutAction);
 }
 
-void MainWindow::projectExisting()
+void MainWindow::enableDisableMenu()
 {
-    project_ = Project::getInstance();
-    editMenu->setEnabled(true);
-    viewMenu->setEnabled(true);
-    saveProjectAction->setEnabled(true);
-    saveAsProjectAction->setEnabled(true);
-    exportAction->setEnabled(true);
-}
-
-void MainWindow::projectNotExisting()
-{
-    delete project_;
-    editMenu->setEnabled(false);
-    viewMenu->setEnabled(false);
-    saveProjectAction->setEnabled(false);
-    saveAsProjectAction->setEnabled(false);
-    exportAction->setEnabled(false);
+    if (project_ != 0) {
+        editMenu->setEnabled(true);
+        viewMenu->setEnabled(true);
+        saveProjectAction->setEnabled(true);
+        saveAsProjectAction->setEnabled(true);
+        exportAction->setEnabled(true);
+    } else {
+        editMenu->setEnabled(false);
+        viewMenu->setEnabled(false);
+        saveProjectAction->setEnabled(false);
+        saveAsProjectAction->setEnabled(false);
+        exportAction->setEnabled(false);
+    }
 }
 
 void MainWindow::openClicked()
@@ -317,7 +327,7 @@ void MainWindow::openClicked()
 							tr("Open saved projects"), ".",
 							tr("FreeGantt files (*.gtt)"));
 	if (!fileName.isEmpty())
-	    loadFile(fileName);
+	    loadFile(fileName.toStdString());
     }
 
 }
@@ -334,16 +344,13 @@ void MainWindow::createMainToolbar()
 
 
 
-
-
-
-
 void MainWindow::newProjectSlot()
 {
-    projectExisting();
+    project_ = new Project();
+    enableDisableMenu();
     createResourceTab();
     createTaskTab();
-    switchToResourceView();
+    switchToTaskTab();
 }
 
 
@@ -373,8 +380,8 @@ bool MainWindow::exitClicked()
 void MainWindow::aboutClicked()
 {
     QMessageBox::about(this, tr("About FreeGantt"),
-		       "<h2>FreeGantt 0.1</h2>"
-		       "<p>Copyright &copy; 2011 Claudio Scordino</p>"
+                       "<h2>FreeGantt 0.2</h2>"
+                       "<p>Copyright &copy; 2013 Claudio Scordino</p>"
 		       "<p> FreeGantt is a small application to draw "
 		       "Gantt diagrams.</p>");
 }
