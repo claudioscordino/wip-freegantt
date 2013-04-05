@@ -8,6 +8,7 @@ class Calendar
 {
 public:
 	Calendar(){}
+	~Calendar();
 
 	inline bool addDate(const QDate& date){
 		return addDate(date, "");

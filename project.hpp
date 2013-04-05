@@ -91,6 +91,8 @@ public:
 
 	Project(){}
 
+	~Project();
+
 
 private:
 	/// List of resources:

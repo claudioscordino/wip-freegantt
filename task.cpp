@@ -23,7 +23,6 @@ bool Task::removeChild(const Task& child)
     return false;
 }
 
-
 bool Task::addPredecessor(Task* predecessor)
 {
     for (std::vector<Task*>::iterator i = predecessors_.begin();

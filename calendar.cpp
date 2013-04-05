@@ -1,6 +1,13 @@
 #include "calendar.hpp"
 
 
+Calendar::~Calendar()
+{
+	for (std::vector<Date*>::iterator i = dates_.begin();
+	    i != dates_.end(); ++i)
+			delete(*i);
+}
+
 bool Calendar::addDate(const QDate& date, const std::string& name)
 {
 	for (std::vector<Date*>::iterator i = dates_.begin();

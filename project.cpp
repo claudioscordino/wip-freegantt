@@ -1,5 +1,16 @@
 #include "project.hpp"
 
+Project::~Project()
+{
+	for (std::vector<Resource*>::iterator i = resources_.begin();
+	     i != resources_.end(); ++i)
+		delete(*i);
+
+	for (std::vector<Task*>::iterator i = tasks_.begin();
+	     i != tasks_.end(); ++i)
+		delete(*i);
+}
+
 Resource* Project::getResource(const std::string& name)
 {
 	for (std::vector<Resource*>::iterator i = resources_.begin();
