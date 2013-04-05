@@ -14,21 +14,23 @@ public:
 
 	// Resources:
 
-	Resource* getResource(const std::string& name);
+	Resource* getResource(int id);
 
-	bool removeResource(const std::string& name);
+	bool removeResource(int id);
 
-	bool addResource(const std::string& name, const std::string& role);
+	int addResource(const std::string& name, const std::string& role);
 
-	inline bool addResource(const std::string& name){
+	inline int addResource(const std::string& name){
 		return addResource (name, "");
 	}
 
-	bool setResourceRole(const std::string& name, const std::string& role);
+	bool setResourceRole(int id, const std::string& role);
 
-	std::string getResourceRole(const std::string& name);
+	std::string getResourceRole(int id);
 
-	bool setResourceName(const std::string& oldname, const std::string& newname);
+	bool setResourceName(int id, const std::string& newname);
+
+	std::string getResourceName(int id);
 
 
 
@@ -48,35 +50,37 @@ public:
 
 	// Tasks:
 
-	Task* getTask(const std::string& name);
+	Task* getTask(int id);
 
-	bool removeTask(const std::string& name);
+	bool removeTask(int id);
 
-	bool addTask (const std::string& name);
+	int addTask (const std::string& name);
 
-	bool addChildTask(const std::string& name, Task* child);
+	bool addChildTask(int id, Task* child);
 
-	bool addPredecessorTask(const std::string& name, Task* predecessor);
+	bool addPredecessorTask(int id, Task* predecessor);
 
-	bool removeChildTask(const std::string& name, const Task& child);
+	bool removeChildTask(int id, const Task& child);
 
-	bool removePredecessorTask(const std::string& name, const Task& predecessor);
+	bool removePredecessorTask(int id, const Task& predecessor);
 
-	QDate getTaskBeginning(const std::string& name);
+	QDate getTaskBeginning(int id);
 
-	bool setTaskBeginning(const std::string& name, const QDate& date);
+	bool setTaskBeginning(int id, const QDate& date);
 
-	int getTaskDuration(const std::string& name);
+	int getTaskDuration(int id);
 
-	bool setTaskDuration(const std::string& name, int duration);
+	bool setTaskDuration(int id, int duration);
 
-	bool setTaskName(const std::string& oldname, const std::string& newname);
+	bool setTaskName(int id, const std::string& newname);
 
-	bool addStopDay(const std::string& oldname, const QDate& date);
+	std::string getTaskName(int id);
 
-	bool removeStopDay(const std::string& oldname, const QDate& date);
+	bool addStopDay(int id, const QDate& date);
 
-	QDate getTaskEnd(const std::string& name);
+	bool removeStopDay(int id, const QDate& date);
+
+	QDate getTaskEnd(int id);
 
 	inline bool loadFile(const std::string& name){
 		file_name_ = name;
@@ -84,7 +88,7 @@ public:
 		return true;
 	}
 
-	inline int getTaskNumber() const {
+	inline int getTasksNumber() const {
 		return tasks_.size();
 	}
 

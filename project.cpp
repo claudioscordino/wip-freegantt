@@ -11,20 +11,20 @@ Project::~Project()
 		delete(*i);
 }
 
-Resource* Project::getResource(const std::string& name)
+Resource* Project::getResource(int id)
 {
 	for (std::vector<Resource*>::iterator i = resources_.begin();
 	     i != resources_.end(); ++i)
-		if ((*i)->getName() == name)
+		if ((*i)->getId() == id)
 			return *i;
 	return 0;
 }
 
-bool Project::removeResource(const std::string& name)
+bool Project::removeResource(int id)
 {
 	for (std::vector<Resource*>::iterator i = resources_.begin();
 	     i != resources_.end(); ++i)
-		if ((*i)->getName() == name){
+		if ((*i)->getId() == id){
 			Resource* r = (*i);
 			resources_.erase(i);
 			delete r;
@@ -34,18 +34,16 @@ bool Project::removeResource(const std::string& name)
 }
 
 
-bool Project::addResource(const std::string& name, const std::string& role)
+int Project::addResource(const std::string& name, const std::string& role)
 {
-	if (getResource(name) != 0) {
-		return false;
-	}
-	resources_.push_back(new Resource (name, role));
-	return true;
+	Resource * r = new Resource (name, role);
+	resources_.push_back(r);
+	return r->getId();
 }
 
-bool Project::setResourceRole(const std::string& name, const std::string& role)
+bool Project::setResourceRole(int id, const std::string& role)
 {
-	Resource* r = getResource(name);
+	Resource* r = getResource(id);
 	if (r == 0) {
 		return false;
 	}
@@ -53,9 +51,9 @@ bool Project::setResourceRole(const std::string& name, const std::string& role)
 	return true;
 }
 
-std::string Project::getResourceRole(const std::string& name)
+std::string Project::getResourceRole(int id)
 {
-	Resource* r = getResource(name);
+	Resource* r = getResource(id);
 	if (r == 0) {
 		return "";
 	}
@@ -63,9 +61,9 @@ std::string Project::getResourceRole(const std::string& name)
 }
 
 
-bool Project::setResourceName(const std::string& oldname, const std::string& newname)
+bool Project::setResourceName(int id, const std::string& newname)
 {
-	Resource* r = getResource(oldname);
+	Resource* r = getResource(id);
 	if (r == 0) {
 		return false;
 	}
@@ -73,22 +71,32 @@ bool Project::setResourceName(const std::string& oldname, const std::string& new
 	return true;
 }
 
+std::string Project::getResourceName(int id)
+{
+	Resource* r = getResource(id);
+	if (r == 0) {
+		return "";
+	}
+	return r->getName();
+}
 
 
-Task* Project::getTask(const std::string& name)
+// Tasks:
+
+Task* Project::getTask(int id)
 {
 	for (std::vector<Task*>::iterator i = tasks_.begin();
 	     i != tasks_.end(); ++i)
-		if ((*i)->getName() == name)
+		if ((*i)->getId() == id)
 			return *i;
 	return 0;
 }
 
-bool Project::removeTask(const std::string& name)
+bool Project::removeTask(int id)
 {
 	for (std::vector<Task*>::iterator i = tasks_.begin();
 	     i != tasks_.end(); ++i)
-		if ((*i)->getName() == name){
+		if ((*i)->getId() == id){
 			Task* r = (*i);
 			tasks_.erase(i);
 			delete r;
@@ -99,43 +107,41 @@ bool Project::removeTask(const std::string& name)
 
 
 
-bool Project::addTask(const std::string& name)
+int Project::addTask(const std::string& name)
 {
-	if (getTask(name) != 0) {
-		return false;
-	}
-	tasks_.push_back(new Task (name));
-	return true;
+	Task* t = new Task (name);
+	tasks_.push_back(t);
+	return t->getId();
 }
 
 
-bool Project::addChildTask(const std::string& name, Task* child)
+bool Project::addChildTask(int id, Task* child)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	return t->addChild(child);
 }
 
-bool Project::addPredecessorTask(const std::string& name, Task* predecessor)
+bool Project::addPredecessorTask(int id, Task* predecessor)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	return t->addPredecessor(predecessor);
 }
 
-bool Project::removeChildTask(const std::string& name, const Task& child)
+bool Project::removeChildTask(int id, const Task& child)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	return t->removeChild(child);
 }
 
-bool Project::removePredecessorTask(const std::string& name, const Task& predecessor)
+bool Project::removePredecessorTask(int id, const Task& predecessor)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	return t->removePredecessor(predecessor);
@@ -143,66 +149,74 @@ bool Project::removePredecessorTask(const std::string& name, const Task& predece
 
 
 
-bool Project::setTaskBeginning(const std::string& name, const QDate& date)
+bool Project::setTaskBeginning(int id, const QDate& date)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	return t->setBegin(date);
 }
 
-bool Project::setTaskDuration(const std::string& name, int duration)
+bool Project::setTaskDuration(int id, int duration)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	return t->setDuration(duration);
 }
 
-QDate Project::getTaskEnd(const std::string& name)
+QDate Project::getTaskEnd(int id)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return QDate::currentDate();
 	return t->getEnd();
 }
 
-QDate Project::getTaskBeginning(const std::string& name)
+QDate Project::getTaskBeginning(int id)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return QDate::currentDate();
 	return t->getBegin();
 }
 
-int Project::getTaskDuration(const std::string& name)
+int Project::getTaskDuration(int id)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return 0;
 	return t->getDuration();
 }
 
-bool Project::setTaskName(const std::string& oldname, const std::string& newname)
+bool Project::setTaskName(int id, const std::string& newname)
 {
-	Task* t = getTask(oldname);
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	t->setName(newname);
 	return true;
 }
 
-bool Project::addStopDay(const std::string& name, const QDate& date)
+std::string Project::getTaskName(int id)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
+	if (t == 0)
+		return "";
+	return t->getName();
+}
+
+bool Project::addStopDay(int id, const QDate& date)
+{
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	return t->addStopDay(date);
 }
 
-bool Project::removeStopDay(const std::string& name, const QDate& date)
+bool Project::removeStopDay(int id, const QDate& date)
 {
-	Task* t = getTask(name);
+	Task* t = getTask(id);
 	if (t == 0)
 		return false;
 	return t->removeStopDay(date);

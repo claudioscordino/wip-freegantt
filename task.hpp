@@ -13,9 +13,12 @@ class Task
 {
 public:
 	Task(const std::string& name):
-		name_(name),
-		begin_(QDate::currentDate()),
-		duration_(0){}
+	    name_(name),
+	    begin_(QDate::currentDate()),
+	    duration_(0){
+		id_ = next_id_;
+		next_id_++;
+	}
 
 	inline std::string getName() const {
 		return name_;
@@ -66,6 +69,10 @@ public:
 
 	QDate getEnd();
 
+	inline int getId(){
+		return id_;
+	}
+
 private:
 	Task();
 
@@ -86,6 +93,12 @@ private:
 
 	/// Stop days:
 	Calendar stop_days_;
+
+	/// Task id:
+	unsigned int id_;
+
+	/// Id generator;
+	static int next_id_;
 };
 
 #endif // TASK_HPP
