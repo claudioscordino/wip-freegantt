@@ -11,19 +11,20 @@
 class Allocation
 {
 public:
-        Allocation();
-        bool set(const std::string& taskName, Resource* resource, int percentage);
-        std::vector<Resource> getResources(const std::string& taskName);
+	Allocation(){}
+	~Allocation();
+	void allocate(int task_id, int resource_id, int percentage);
+	bool deallocate(int task_id, int resource_id);
+	std::vector<int> getTaskResources(int task_id);
 
 private:
-    struct TaskAllocation {
-                Resource* resource_;
-                int percentage_; // 0 - 100
-    };
+	struct TaskAllocation {
+		int task_id_;
+		int resource_id_;
+		int percentage_; // 0 - 100
+	};
 
-
-   std::map<Task*, TaskAllocation*> allocations_;
-
+	std::vector<TaskAllocation*> allocations_;
 };
 
 #endif // ALLOCATION_HPP

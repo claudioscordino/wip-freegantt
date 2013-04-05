@@ -7,10 +7,14 @@
 #include "resource.hpp"
 #include "task.hpp"
 #include "calendar.hpp"
+#include "allocation.hpp"
 
 class Project
 {
 public:
+
+	Project(){}
+	~Project();
 
 	// Resources:
 
@@ -93,9 +97,19 @@ public:
 	}
 
 
-	Project(){}
+	// Allocation:
 
-	~Project();
+	inline void allocate(int task_id, int resource_id, int percentage){
+		allocations_.allocate(task_id, resource_id, percentage);
+	}
+
+	inline bool deallocate(int task_id, int resource_id){
+		return allocations_.deallocate(task_id, resource_id);
+	}
+
+	inline std::vector<int> getTaskResources(int task_id){
+		return allocations_.getTaskResources(task_id);
+	}
 
 
 private:
@@ -113,6 +127,8 @@ private:
 
 	/// Path of the project file name:
 	std::string file_name_;
+
+	Allocation allocations_;
 };
 
 #endif // PROJECT_HPP
