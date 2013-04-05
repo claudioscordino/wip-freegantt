@@ -14,86 +14,87 @@
 
 
 namespace Ui {
-    class MainWindow;
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+	explicit MainWindow(QWidget *parent = 0);
+	void refreshTaskTable();
+		~MainWindow();
 
 private:
 
-    Project* project_;
-    QTableWidget* taskTable_;
-    QTableWidget* resourceTable_;
+	Project* project_;
+	QTableWidget* taskTable_;
+	QTableWidget* resourceTable_;
 
-    Ui::MainWindow *ui;
+	Ui::MainWindow *ui;
 
-    // File menu:
-    QMenu* fileMenu;
-    QAction* newProjectAction;
-    QAction* openProjectAction;
-    QAction* recentProjectsAction;
-    QAction* saveProjectAction;
-    QAction* saveAsProjectAction;
-    QAction* exportAction;
-    QAction* exitAction;
-    QAction* optionsAction;
+	// File menu:
+	QMenu* fileMenu;
+	QAction* newProjectAction;
+	QAction* openProjectAction;
+	QAction* recentProjectsAction;
+	QAction* saveProjectAction;
+	QAction* saveAsProjectAction;
+	QAction* exportAction;
+	QAction* exitAction;
+	QAction* optionsAction;
 
-    // Edit menu:
-    QMenu* editMenu;
-    QAction* newResourceAction;
-    QAction* deleteResourceAction;
-    QAction* newTaskAction;
-    QAction* deleteTaskAction;
+	// Edit menu:
+	QMenu* editMenu;
+	QAction* newResourceAction;
+	QAction* deleteResourceAction;
+	QAction* newTaskAction;
+	QAction* deleteTaskAction;
 
-    // View menu:
-    QMenu* viewMenu;
-    QAction* viewResourceAction;
-    QAction* viewTaskAction;
+	// View menu:
+	QMenu* viewMenu;
+	QAction* viewResourceAction;
+	QAction* viewTaskAction;
 
-    // About menu:
-    QMenu* aboutMenu;
-    QAction* aboutAction;
+	// About menu:
+	QMenu* aboutMenu;
+	QAction* aboutAction;
 
-    // Main toolbar
-    QAction* indentTaskAction;
-    QAction* deindentTaskAction;
+	// Main toolbar
+	QAction* indentTaskAction;
+	QAction* deindentTaskAction;
 
-    QToolBar* mainToolbar;
+	QToolBar* mainToolbar;
 
-    QTabWidget tab;
+	QTabWidget tab;
 
-    void createMainMenu();
-    void createMainToolbar();
-    void enableDisableMenu();
-    bool loadFile(const std::string& filename){
-        return project_->loadFile(filename);
-    }
+	void createMainMenu();
+	void createMainToolbar();
+	void enableDisableMenu();
+	bool loadFile(const std::string& filename){
+		return project_->loadFile(filename);
+	}
 
-    void createResourceTab();
-    void createTaskTab();
+	void createResourceTab();
+	void createTaskTab();
 
 protected:
-    inline void closeEvent(QCloseEvent* ){
-        exitClicked();
-    }
+	inline void closeEvent(QCloseEvent* ){
+		exitClicked();
+	}
 
 private slots:
-    bool saveProject();
-    bool exitClicked();
-    void newProjectSlot();
-    bool saveClicked(){return true;}
-    void openClicked();
-    void aboutClicked();
-    void switchTab(int tab);
-    void switchToTaskTab();
-    void switchToResourceTab();
-    void newTaskSlot();
+	bool saveProject();
+	bool exitClicked();
+	void newProjectSlot();
+	bool saveClicked(){return true;}
+	void openClicked();
+	void aboutClicked();
+	void switchTab(int tab);
+	void switchToTaskTab();
+	void switchToResourceTab();
+	void newTaskSlot();
 };
 
 #endif // MAINWINDOW_HPP

@@ -5,27 +5,31 @@
 #include <vector>
 #include <QDate>
 
-#include "task.hpp"
+class Task;
 
 class Tasks
 {
 public:
 	Tasks(){}
-	~Tasks();
+	~Tasks(){}
 
-	Task* getTask(int id);
+	Task* getTaskFromId(int id);
 
-	bool removeTask(int id);
+	Task* getTaskSequentially(int position);
 
-	int addTask (const std::string& name);
+	Task* removeTask(const Task& t);
+
+	Task* removeTask(int id);
+
+	int addTask(Task* t);
 
 	bool addChildTask(int id, Task* child);
 
 	bool addPredecessorTask(int id, Task* predecessor);
 
-	bool removeChildTask(int id, const Task& child);
+	Task* removeChildTask(int id, const Task& child);
 
-	bool removePredecessorTask(int id, const Task& predecessor);
+	Task* removePredecessorTask(int id, const Task& predecessor);
 
 	QDate getTaskBeginning(int id);
 

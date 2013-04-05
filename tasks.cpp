@@ -1,13 +1,8 @@
 #include "tasks.hpp"
+#include "task.hpp"
 
-Tasks::~Tasks()
-{
-	for (std::vector<Task*>::iterator i = tasks_.begin();
-	     i != tasks_.end(); ++i)
-		delete(*i);
-}
 
-Task* Tasks::getTask(int id)
+Task* Tasks::getTaskFromId(int id)
 {
 	for (std::vector<Task*>::iterator i = tasks_.begin();
 	     i != tasks_.end(); ++i)
@@ -16,24 +11,32 @@ Task* Tasks::getTask(int id)
 	return 0;
 }
 
-bool Tasks::removeTask(int id)
+Task* Tasks::getTaskSequentially(int position)
+{
+	return tasks_.at(position);
+}
+
+
+Task* Tasks::removeTask(int id)
 {
 	for (std::vector<Task*>::iterator i = tasks_.begin();
 	     i != tasks_.end(); ++i)
 		if ((*i)->getId() == id){
-			Task* r = (*i);
+			Task* t = (*i);
 			tasks_.erase(i);
-			delete r;
-			return true;
+			return t;
 		}
-	return false;
+	return 0;
+}
+
+Task* Tasks::removeTask(const Task &t)
+{
+	return removeTask(t.getId());
 }
 
 
-
-int Tasks::addTask(const std::string& name)
+int Tasks::addTask(Task* t)
 {
-	Task* t = new Task (name);
 	tasks_.push_back(t);
 	return t->getId();
 }
@@ -41,7 +44,7 @@ int Tasks::addTask(const std::string& name)
 
 bool Tasks::addChildTask(int id, Task* child)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return false;
 	return t->addChild(child);
@@ -49,25 +52,21 @@ bool Tasks::addChildTask(int id, Task* child)
 
 bool Tasks::addPredecessorTask(int id, Task* predecessor)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return false;
 	return t->addPredecessor(predecessor);
 }
 
-bool Tasks::removeChildTask(int id, const Task& child)
+Task* Tasks::removeChildTask(int id, const Task& child)
 {
-	Task* t = getTask(id);
-	if (t == 0)
-		return false;
+	Task* t = getTaskFromId(id);
 	return t->removeChild(child);
 }
 
-bool Tasks::removePredecessorTask(int id, const Task& predecessor)
+Task* Tasks::removePredecessorTask(int id, const Task& predecessor)
 {
-	Task* t = getTask(id);
-	if (t == 0)
-		return false;
+	Task* t = getTaskFromId(id);
 	return t->removePredecessor(predecessor);
 }
 
@@ -75,7 +74,7 @@ bool Tasks::removePredecessorTask(int id, const Task& predecessor)
 
 bool Tasks::setTaskBeginning(int id, const QDate& date)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return false;
 	return t->setBegin(date);
@@ -83,7 +82,7 @@ bool Tasks::setTaskBeginning(int id, const QDate& date)
 
 bool Tasks::setTaskDuration(int id, int duration)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return false;
 	return t->setDuration(duration);
@@ -91,7 +90,7 @@ bool Tasks::setTaskDuration(int id, int duration)
 
 QDate Tasks::getTaskEnd(int id)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return QDate::currentDate();
 	return t->getEnd();
@@ -99,7 +98,7 @@ QDate Tasks::getTaskEnd(int id)
 
 QDate Tasks::getTaskBeginning(int id)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return QDate::currentDate();
 	return t->getBegin();
@@ -107,7 +106,7 @@ QDate Tasks::getTaskBeginning(int id)
 
 int Tasks::getTaskDuration(int id)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return 0;
 	return t->getDuration();
@@ -115,7 +114,7 @@ int Tasks::getTaskDuration(int id)
 
 bool Tasks::setTaskName(int id, const std::string& newname)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return false;
 	t->setName(newname);
@@ -124,7 +123,7 @@ bool Tasks::setTaskName(int id, const std::string& newname)
 
 std::string Tasks::getTaskName(int id)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return "";
 	return t->getName();
@@ -132,7 +131,7 @@ std::string Tasks::getTaskName(int id)
 
 bool Tasks::addStopDay(int id, const QDate& date)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return false;
 	return t->addStopDay(date);
@@ -140,7 +139,7 @@ bool Tasks::addStopDay(int id, const QDate& date)
 
 bool Tasks::removeStopDay(int id, const QDate& date)
 {
-	Task* t = getTask(id);
+	Task* t = getTaskFromId(id);
 	if (t == 0)
 		return false;
 	return t->removeStopDay(date);

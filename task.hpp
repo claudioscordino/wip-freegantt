@@ -8,6 +8,7 @@
 
 //#include "resource.hpp"
 #include "calendar.hpp"
+#include "tasks.hpp"
 
 class Task
 {
@@ -55,23 +56,48 @@ public:
 		return stop_days_.addDate(date);
 	}
 
-	bool removeStopDay(const QDate& date){
+	inline bool removeStopDay(const QDate& date){
 		return stop_days_.removeDate(date);
 	}
 
-	bool addChild(Task* child);
+	inline bool addChild(Task* child){
+		return children_.addTask(child);
+	}
 
-	bool removeChild(const Task& child);
+	inline Task* removeChild(const Task& child){
+		return children_.removeTask(child);
+	}
 
-	bool addPredecessor(Task* predecessor);
+	inline bool addPredecessor(Task* predecessor){
+		return predecessors_.addTask(predecessor);
+	}
 
-	bool removePredecessor(const Task& predecessor);
+	inline Task* removePredecessor(const Task& predecessor){
+		return predecessors_.removeTask(predecessor);
+	}
 
 	QDate getEnd();
 
-	inline int getId(){
+	inline int getId() const{
 		return id_;
 	}
+
+	inline int getChildrenNumber() const{
+		return children_.getTasksNumber();
+	}
+
+	inline int getPredecessorsNumber() const{
+		return predecessors_.getTasksNumber();
+	}
+
+	inline Task* getChildrenSequentially(int position){
+		return children_.getTaskSequentially(position);
+	}
+
+	inline Task* getPredecessorsSequentially(int position){
+		return predecessors_.getTaskSequentially(position);
+	}
+
 
 private:
 	Task();
@@ -80,10 +106,10 @@ private:
 	std::string name_;
 
 	/// Children of the task:
-	std::vector<Task*> children_;
+	Tasks children_;
 
 	/// Predecossors of the task:
-	std::vector<Task*> predecessors_;
+	Tasks predecessors_;
 
 	/// Begin of the task:
 	QDate begin_;

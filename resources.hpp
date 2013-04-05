@@ -10,17 +10,14 @@ class Resources
 {
 public:
 	Resources(){}
-	~Resources();
+	~Resources(){}
 
-	Resource* getResource(int id);
+	Resource* getResourceFromId(int id);
+	Resource* getResourceSequentially(int position);
 
-	bool removeResource(int id);
+	Resource* removeResource(int id);
 
-	int addResource(const std::string& name, const std::string& role);
-
-	inline int addResource(const std::string& name){
-		return addResource (name, "");
-	}
+	int addResource(Resource* r);
 
 	bool setResourceRole(int id, const std::string& role);
 

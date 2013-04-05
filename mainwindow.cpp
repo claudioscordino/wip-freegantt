@@ -36,11 +36,70 @@ MainWindow::MainWindow(QWidget *parent) :
 //========== TAB ===========================
 
 
+void MainWindow::refreshTaskTable()
+{
+	// Delete table and items
+	for (int i = 0; i < project_->getTasksNumber(); ++i){
+		Task* t = project_->getTaskSequentially(i);
+
+		taskTable_->insertRow(taskTable_->rowCount());
+
+		QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
+		newItemTaskId->setTextAlignment(Qt::AlignCenter);
+		newItemTaskId->setText(QString::number(t->getId()));
+		taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
+
+		QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
+		newItemTaskId->setTextAlignment(Qt::AlignLeft);
+		newItemTaskName->setText(QString::fromStdString(t->getName()));
+		taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
+
+		QTableWidgetItem *newItemBegin = new QTableWidgetItem();
+		newItemBegin->setTextAlignment(Qt::AlignCenter);
+		newItemBegin->setText(t->getBegin().toString("dd.MM.yyyy"));
+		taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
+
+		QTableWidgetItem *newItemDuration = new QTableWidgetItem();
+		newItemDuration->setTextAlignment(Qt::AlignCenter);
+		newItemDuration->setText(QString::number(t->getDuration()));
+		taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
+
+		//if (t->getChildrenNumber() > 0)
+		//	newItemTaskName->setFont(QFont(QFont::Bold));
+
+		// Children:
+		for (int c = 0; c < t->getChildrenNumber(); ++c){
+			Task* ch = t->getChildrenSequentially(c);
+
+			taskTable_->insertRow(taskTable_->rowCount());
+
+			QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
+			newItemTaskId->setTextAlignment(Qt::AlignCenter);
+			newItemTaskId->setText(QString::number(ch->getId()));
+			taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
+
+			QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
+			newItemTaskId->setTextAlignment(Qt::AlignLeft);
+			newItemTaskName->setText(QString::fromStdString(ch->getName()));
+			taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
+
+			QTableWidgetItem *newItemBegin = new QTableWidgetItem();
+			newItemBegin->setTextAlignment(Qt::AlignCenter);
+			newItemBegin->setText(ch->getBegin().toString("dd.MM.yyyy"));
+			taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
+
+			QTableWidgetItem *newItemDuration = new QTableWidgetItem();
+			newItemDuration->setTextAlignment(Qt::AlignCenter);
+			newItemDuration->setText(QString::number(ch->getDuration()));
+			taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
+		}
+	}
+}
+
 void MainWindow::newTaskSlot()
 {
-       project_->addTask("New task");
-       // TODO: update taskTable_;
-
+	project_->addTask(new Task("New task"));
+	refreshTaskTable();
 }
 
 
@@ -79,21 +138,24 @@ void MainWindow::switchTab(int tab_nb)
 void MainWindow::createTaskTab()
 {
     // Create left table:
-    int numberOfColumns = 3;
-    taskTable_ = new QTableWidget(0, 3);
+    int numberOfColumns = 4;
+    taskTable_ = new QTableWidget(0, 4);
     QStringList labels;
-    labels.append("Task");
+    labels.append("Id");
+    labels.append("Name");
     labels.append("Begin");
-    labels.append("End");
+    labels.append("Duration");
     taskTable_->setHorizontalHeaderLabels(labels);
     taskTable_->verticalHeader()->setVisible(false);
     taskTable_->setMinimumWidth(numberOfColumns * 70);
     taskTable_->setMaximumWidth(numberOfColumns * 70);
+    taskTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Set width of the three columns:
-    taskTable_->setColumnWidth(0, 68);
-    taskTable_->setColumnWidth(1, 68);
-    taskTable_->setColumnWidth(2, 68);
+    taskTable_->setColumnWidth(0, 60);
+    taskTable_->setColumnWidth(1, 70);
+    taskTable_->setColumnWidth(2, 80);
+    taskTable_->setColumnWidth(3, 70);
 
     // Create left scene:
     QGraphicsScene* taskScene = new QGraphicsScene(this);
@@ -155,17 +217,19 @@ void MainWindow::createTaskTab()
 void MainWindow::createResourceTab()
 {
     // Create left table:
-    int numberOfColumns = 2;
-    resourceTable_ = new QTableWidget(0, 2);
+    int numberOfColumns = 3;
+    resourceTable_ = new QTableWidget(0, 3);
     QStringList labels;
+    labels.append("Id");
     labels.append("Name");
-    labels.append("Job");
+    labels.append("Role");
     resourceTable_->setHorizontalHeaderLabels(labels);
     resourceTable_->verticalHeader()->setVisible(false);
     resourceTable_->setMinimumWidth(numberOfColumns * 70);
     resourceTable_->setMaximumWidth(numberOfColumns * 70);
-    resourceTable_->setColumnWidth(0, 68);
-    resourceTable_->setColumnWidth(1, 68);
+    resourceTable_->setColumnWidth(0, 70);
+    resourceTable_->setColumnWidth(1, 70);
+    resourceTable_->setColumnWidth(2, 70);
 
     // Create left scene:
     QGraphicsScene* resourceScene = new QGraphicsScene(this);
@@ -306,7 +370,7 @@ void MainWindow::createMainMenu()
 void MainWindow::enableDisableMenu()
 {
     if (project_ != 0) {
-        editMenu->setEnabled(true);
+	editMenu->setEnabled(true);
         viewMenu->setEnabled(true);
         saveProjectAction->setEnabled(true);
         saveAsProjectAction->setEnabled(true);

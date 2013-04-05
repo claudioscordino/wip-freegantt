@@ -18,20 +18,16 @@ public:
 
 	// Resources:
 
-	inline Resource* getResource(int id){
-		return resources_.getResource(id);
+	inline Resource* getResourceFromId(int id){
+		return resources_.getResourceFromId(id);
 	}
 
 	inline bool removeResource(int id){
 		return resources_.removeResource(id);
 	}
 
-	inline int addResource(const std::string& name, const std::string& role){
-		return resources_.addResource(name, role);
-	}
-
-	inline int addResource(const std::string& name){
-		return resources_.addResource (name);
+	inline int addResource(Resource* r){
+		return resources_.addResource(r);
 	}
 
 	inline bool setResourceRole(int id, const std::string& role){
@@ -68,16 +64,20 @@ public:
 
 	// Tasks:
 
-	inline Task* getTask(int id){
-		return tasks_.getTask(id);
+	inline Task* getTaskFromId(int id){
+		return tasks_.getTaskFromId(id);
+	}
+
+	inline Task* getTaskSequentially(int position){
+		return tasks_.getTaskSequentially(position);
 	}
 
 	inline bool removeTask(int id){
 		return tasks_.removeTask(id);
 	}
 
-	inline int addTask (const std::string& name){
-		return tasks_.addTask(name);
+	inline int addTask (Task* t){
+		return tasks_.addTask(t);
 	}
 
 	inline bool addChildTask(int id, Task* child){

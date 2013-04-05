@@ -1,13 +1,6 @@
 #include "resources.hpp"
 
-Resources::~Resources()
-{
-	for (std::vector<Resource*>::iterator i = resources_.begin();
-	     i != resources_.end(); ++i)
-		delete(*i);
-}
-
-Resource* Resources::getResource(int id)
+Resource* Resources::getResourceFromId(int id)
 {
 	for (std::vector<Resource*>::iterator i = resources_.begin();
 	     i != resources_.end(); ++i)
@@ -16,30 +9,34 @@ Resource* Resources::getResource(int id)
 	return 0;
 }
 
-bool Resources::removeResource(int id)
+Resource* Resources::getResourceSequentially(int position)
+{
+	return resources_.at(position);
+}
+
+
+Resource* Resources::removeResource(int id)
 {
 	for (std::vector<Resource*>::iterator i = resources_.begin();
 	     i != resources_.end(); ++i)
 		if ((*i)->getId() == id){
 			Resource* r = (*i);
 			resources_.erase(i);
-			delete r;
-			return true;
+			return r;
 		}
-	return false;
+	return 0;
 }
 
 
-int Resources::addResource(const std::string& name, const std::string& role)
+int Resources::addResource(Resource* r)
 {
-	Resource * r = new Resource (name, role);
 	resources_.push_back(r);
 	return r->getId();
 }
 
 bool Resources::setResourceRole(int id, const std::string& role)
 {
-	Resource* r = getResource(id);
+	Resource* r = getResourceFromId(id);
 	if (r == 0) {
 		return false;
 	}
@@ -49,7 +46,7 @@ bool Resources::setResourceRole(int id, const std::string& role)
 
 std::string Resources::getResourceRole(int id)
 {
-	Resource* r = getResource(id);
+	Resource* r = getResourceFromId(id);
 	if (r == 0) {
 		return "";
 	}
@@ -59,7 +56,7 @@ std::string Resources::getResourceRole(int id)
 
 bool Resources::setResourceName(int id, const std::string& newname)
 {
-	Resource* r = getResource(id);
+	Resource* r = getResourceFromId(id);
 	if (r == 0) {
 		return false;
 	}
@@ -69,7 +66,7 @@ bool Resources::setResourceName(int id, const std::string& newname)
 
 std::string Resources::getResourceName(int id)
 {
-	Resource* r = getResource(id);
+	Resource* r = getResourceFromId(id);
 	if (r == 0) {
 		return "";
 	}
