@@ -4,8 +4,8 @@
 #include <vector>
 #include <QDate>
 
-#include "resource.hpp"
-#include "task.hpp"
+#include "resources.hpp"
+#include "tasks.hpp"
 #include "calendar.hpp"
 #include "allocation.hpp"
 
@@ -14,27 +14,41 @@ class Project
 public:
 
 	Project(){}
-	~Project();
+	~Project(){}
 
 	// Resources:
 
-	Resource* getResource(int id);
-
-	bool removeResource(int id);
-
-	int addResource(const std::string& name, const std::string& role);
-
-	inline int addResource(const std::string& name){
-		return addResource (name, "");
+	inline Resource* getResource(int id){
+		return resources_.getResource(id);
 	}
 
-	bool setResourceRole(int id, const std::string& role);
+	inline bool removeResource(int id){
+		return resources_.removeResource(id);
+	}
 
-	std::string getResourceRole(int id);
+	inline int addResource(const std::string& name, const std::string& role){
+		return resources_.addResource(name, role);
+	}
 
-	bool setResourceName(int id, const std::string& newname);
+	inline int addResource(const std::string& name){
+		return resources_.addResource (name);
+	}
 
-	std::string getResourceName(int id);
+	inline bool setResourceRole(int id, const std::string& role){
+		return resources_.setResourceRole(id, role);
+	}
+
+	inline std::string getResourceRole(int id){
+		return resources_.getResourceRole(id);
+	}
+
+	inline bool setResourceName(int id, const std::string& newname){
+		return resources_.setResourceName(id, newname);
+	}
+
+	inline std::string getResourceName(int id){
+		return resources_.getResourceName(id);
+	}
 
 
 
@@ -54,37 +68,71 @@ public:
 
 	// Tasks:
 
-	Task* getTask(int id);
+	inline Task* getTask(int id){
+		return tasks_.getTask(id);
+	}
 
-	bool removeTask(int id);
+	inline bool removeTask(int id){
+		return tasks_.removeTask(id);
+	}
 
-	int addTask (const std::string& name);
+	inline int addTask (const std::string& name){
+		return tasks_.addTask(name);
+	}
 
-	bool addChildTask(int id, Task* child);
+	inline bool addChildTask(int id, Task* child){
+		return tasks_.addChildTask(id, child);
+	}
 
-	bool addPredecessorTask(int id, Task* predecessor);
+	inline bool addPredecessorTask(int id, Task* predecessor){
+		return tasks_.addPredecessorTask(id, predecessor);
+	}
 
-	bool removeChildTask(int id, const Task& child);
+	inline bool removeChildTask(int id, const Task& child){
+		return tasks_.removeChildTask(id, child);
+	}
 
-	bool removePredecessorTask(int id, const Task& predecessor);
+	inline bool removePredecessorTask(int id, const Task& predecessor){
+		return tasks_.removePredecessorTask(id, predecessor);
+	}
 
-	QDate getTaskBeginning(int id);
+	inline QDate getTaskBeginning(int id){
+		return tasks_.getTaskBeginning(id);
+	}
 
-	bool setTaskBeginning(int id, const QDate& date);
+	inline bool setTaskBeginning(int id, const QDate& date){
+		return tasks_.setTaskBeginning(id, date);
+	}
 
-	int getTaskDuration(int id);
+	inline int getTaskDuration(int id){
+		return tasks_.getTaskDuration(id);
+	}
 
-	bool setTaskDuration(int id, int duration);
+	inline bool setTaskDuration(int id, int duration){
+		return tasks_.setTaskDuration(id, duration);
+	}
 
-	bool setTaskName(int id, const std::string& newname);
+	inline bool setTaskName(int id, const std::string& newname){
+		return tasks_.setTaskName(id, newname);
+	}
 
-	std::string getTaskName(int id);
+	inline std::string getTaskName(int id){
+		return tasks_.getTaskName(id);
+	}
 
-	bool addStopDay(int id, const QDate& date);
+	inline bool addStopDay(int id, const QDate& date){
+		return tasks_.addStopDay(id, date);
+	}
 
-	bool removeStopDay(int id, const QDate& date);
+	inline bool removeStopDay(int id, const QDate& date){
+		return tasks_.removeStopDay(id, date);
+	}
 
-	QDate getTaskEnd(int id);
+	inline QDate getTaskEnd(int id){
+		return tasks_.getTaskEnd(id);
+	}
+
+	//Files:
 
 	inline bool loadFile(const std::string& name){
 		file_name_ = name;
@@ -93,7 +141,7 @@ public:
 	}
 
 	inline int getTasksNumber() const {
-		return tasks_.size();
+		return tasks_.getTasksNumber();
 	}
 
 
@@ -114,10 +162,10 @@ public:
 
 private:
 	/// List of resources:
-	std::vector<Resource*> resources_;
+	Resources resources_;
 
 	/// List of tasks:
-	std::vector<Task*> tasks_;
+	Tasks tasks_;
 
 	/// List of holidays:
 	Calendar holidays_;

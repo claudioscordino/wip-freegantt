@@ -3,10 +3,10 @@
 
 #include <string>
 #include <vector>
-#include <QColor>
+//#include <QColor>
 #include <QDate>
 
-#include "resource.hpp"
+//#include "resource.hpp"
 #include "calendar.hpp"
 
 class Task
