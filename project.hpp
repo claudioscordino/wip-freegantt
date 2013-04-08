@@ -73,6 +73,11 @@ public:
 	}
 
 	inline bool removeTask(int id){
+		Task* t = tasks_.getTaskFromId(id);
+		// In case of child, remove from parent's children:
+		if (t->getParent() != 0)
+			t->getParent()->removeChild(t);
+		// Then, remove the task:
 		return tasks_.removeTask(id);
 	}
 
@@ -88,11 +93,11 @@ public:
 		return tasks_.addPredecessorTask(id, predecessor);
 	}
 
-	inline bool removeChildTask(int id, const Task& child){
-		return tasks_.removeChildTask(id, child);
+	inline bool removeChildTask(Task* child){
+		return tasks_.removeChildTask(child);
 	}
 
-	inline bool removePredecessorTask(int id, const Task& predecessor){
+	inline bool removePredecessorTask(int id, Task* predecessor){
 		return tasks_.removePredecessorTask(id, predecessor);
 	}
 

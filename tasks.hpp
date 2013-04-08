@@ -17,19 +17,21 @@ public:
 
 	Task* getTaskSequentially(int position);
 
-	Task* removeTask(const Task& t);
+	Task* removeTask(Task* t);
 
 	Task* removeTask(int id);
 
-	int addTask(Task* t);
+	bool addTask(Task* t);
 
 	bool addChildTask(int id, Task* child);
 
 	bool addPredecessorTask(int id, Task* predecessor);
 
-	Task* removeChildTask(int id, const Task& child);
+	bool removeChildTask(Task* child);
 
-	Task* removePredecessorTask(int id, const Task& predecessor);
+	Task* removePredecessorTask(int id, Task* predecessor);
+
+	Task* getParentTask(int child_id);
 
 	QDate getTaskBeginning(int id);
 

@@ -1,6 +1,8 @@
 #include "tasks.hpp"
 #include "task.hpp"
 
+#include <iostream>
+
 
 Task* Tasks::getTaskFromId(int id)
 {
@@ -23,22 +25,29 @@ Task* Tasks::removeTask(int id)
 	     i != tasks_.end(); ++i)
 		if ((*i)->getId() == id){
 			Task* t = (*i);
+			// In case of parent, reparent the children:
+			for (int ch = 0; ch < t->getChildrenNumber(); ++ch)
+				t->getChildrenSequentially(ch)->setParent(0);
 			tasks_.erase(i);
 			return t;
 		}
 	return 0;
 }
 
-Task* Tasks::removeTask(const Task &t)
+Task* Tasks::removeTask(Task* t)
 {
-	return removeTask(t.getId());
+	return removeTask(t->getId());
 }
 
 
-int Tasks::addTask(Task* t)
+bool Tasks::addTask(Task* t)
 {
-	tasks_.push_back(t);
-	return t->getId();
+	if (getTaskFromId(t->getId()) == 0){
+		tasks_.push_back(t);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 
@@ -50,6 +59,14 @@ bool Tasks::addChildTask(int id, Task* child)
 	return t->addChild(child);
 }
 
+Task* Tasks::getParentTask(int child_id)
+{
+	Task* t = getTaskFromId(child_id);
+	if (t == 0)
+		return 0;
+	return t->getParent();
+}
+
 bool Tasks::addPredecessorTask(int id, Task* predecessor)
 {
 	Task* t = getTaskFromId(id);
@@ -58,13 +75,26 @@ bool Tasks::addPredecessorTask(int id, Task* predecessor)
 	return t->addPredecessor(predecessor);
 }
 
-Task* Tasks::removeChildTask(int id, const Task& child)
+bool Tasks::removeChildTask(Task* child)
 {
-	Task* t = getTaskFromId(id);
-	return t->removeChild(child);
+	for (std::vector<Task*>::iterator i = tasks_.begin();
+	     i != tasks_.end(); ++i){
+		std::cout << "Checking task " << (*i)->getId() << std::endl;
+		if ((*i)->getParent() != 0)
+			continue;
+		for (int c = 0; c < (*i)->getChildrenNumber(); ++c){
+			std::cout << "Found child" << (*i)->getChildrenSequentially(c)->getId() << std::endl;
+			Task* ch = (*i)->getChildrenSequentially(c);
+			if ((ch->getId()) == (child->getId())){
+				(*i)->removeChild(ch);
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
-Task* Tasks::removePredecessorTask(int id, const Task& predecessor)
+Task* Tasks::removePredecessorTask(int id, Task* predecessor)
 {
 	Task* t = getTaskFromId(id);
 	return t->removePredecessor(predecessor);

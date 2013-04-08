@@ -32,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(&tab, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
 	connect(newTaskAction, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
 	connect(deleteTaskAction, SIGNAL(triggered()), this, SLOT(removeTaskSlot()));
+	connect(indentTaskAction, SIGNAL(triggered()), this, SLOT(indentTaskSlot()));
+	connect(deindentTaskAction, SIGNAL(triggered()), this, SLOT(deindentTaskSlot()));
 }
 
 //========== TAB ===========================
@@ -39,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::refreshTaskTable()
 {
+	taskTable_->blockSignals(true);
+
 	// Delete table and items:
 	for (int r = taskTable_->rowCount(); r >= 0; --r)
 		taskTable_->removeRow(r);
@@ -46,11 +50,15 @@ void MainWindow::refreshTaskTable()
 	for (int i = 0; i < project_->getTasksNumber(); ++i){
 		Task* t = project_->getTaskSequentially(i);
 
+		// Children will be printed after their parent:
+		if (t->getParent() != 0)
+			continue;
+
 		taskTable_->insertRow(taskTable_->rowCount());
 
 		QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
 		newItemTaskId->setTextAlignment(Qt::AlignCenter);
-		newItemTaskId->setText(QString::fromStdString(t->getId()));
+		newItemTaskId->setText(QString::number(t->getId()));
 		taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
 
 		QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
@@ -68,36 +76,48 @@ void MainWindow::refreshTaskTable()
 		newItemDuration->setText(QString::number(t->getDuration()));
 		taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
 
-		//if (t->getChildrenNumber() > 0)
-		//	newItemTaskName->setFont(QFont(QFont::Bold));
+		if (t->getChildrenNumber() > 0){
+			QFont font = newItemTaskName->font();
+			font.setBold(true);
+			newItemTaskName->setFont(font);
 
-		// Children:
-		for (int c = 0; c < t->getChildrenNumber(); ++c){
-			Task* ch = t->getChildrenSequentially(c);
+			// Print children:
+			for (int c = 0; c < t->getChildrenNumber(); ++c){
+				Task* ch = t->getChildrenSequentially(c);
+				std::cout << "Task " << t->getId() << " has child " << ch->getId() << std::endl;
 
-			taskTable_->insertRow(taskTable_->rowCount());
 
-			QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
-			newItemTaskId->setTextAlignment(Qt::AlignCenter);
-			newItemTaskId->setText(QString::fromStdString(ch->getId()));
-			taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
+				taskTable_->insertRow(taskTable_->rowCount());
 
-			QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
-			newItemTaskId->setTextAlignment(Qt::AlignLeft);
-			newItemTaskName->setText(QString::fromStdString(ch->getName()));
-			taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
+				QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
+				newItemTaskId->setTextAlignment(Qt::AlignCenter);
+				newItemTaskId->setText(QString::number(ch->getId()));
+				taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
 
-			QTableWidgetItem *newItemBegin = new QTableWidgetItem();
-			newItemBegin->setTextAlignment(Qt::AlignCenter);
-			newItemBegin->setText(ch->getBegin().toString("dd.MM.yyyy"));
-			taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
+				QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
+				newItemTaskId->setTextAlignment(Qt::AlignLeft);
 
-			QTableWidgetItem *newItemDuration = new QTableWidgetItem();
-			newItemDuration->setTextAlignment(Qt::AlignCenter);
-			newItemDuration->setText(QString::number(ch->getDuration()));
-			taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
+				QFont font = newItemTaskName->font();
+				font.setItalic(true);
+				newItemTaskName->setFont(font);
+
+				newItemTaskName->setText(QString::fromStdString("   " + ch->getName()));
+				taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
+
+				QTableWidgetItem *newItemBegin = new QTableWidgetItem();
+				newItemBegin->setTextAlignment(Qt::AlignCenter);
+				newItemBegin->setText(ch->getBegin().toString("dd.MM.yyyy"));
+				taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
+
+				QTableWidgetItem *newItemDuration = new QTableWidgetItem();
+				newItemDuration->setTextAlignment(Qt::AlignCenter);
+				newItemDuration->setText(QString::number(ch->getDuration()));
+				taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
+			}
 		}
 	}
+	taskTable_->blockSignals(false);
+
 }
 
 void MainWindow::newTaskSlot()
@@ -109,11 +129,72 @@ void MainWindow::newTaskSlot()
 void MainWindow::removeTaskSlot()
 {
 	int row = taskTable_->currentRow();
+	if (row < 0 || row > taskTable_->rowCount())
+		return;
 	int id = taskTable_->item(row, 0)->text().toInt();
 	project_->removeTask(id);
 	refreshTaskTable();
 }
 
+void MainWindow::indentTaskSlot()
+{
+	int row = taskTable_->currentRow();
+
+	// No row selected:
+	if (row < 1 || row > taskTable_->rowCount())
+		return;
+
+	int child = taskTable_->item(row, 0)->text().toInt();
+
+	// Task is already a child:
+	if (project_->getTaskFromId(child) == 0)
+		return;
+
+	// Iterate to find the parent:
+	while (project_->getTaskFromId(taskTable_->item(row-1, 0)->text().toInt())->getParent() != 0)
+		row--;
+
+	int parent = taskTable_->item(row-1, 0)->text().toInt();
+
+	std::cout << "Parent id: " << parent
+		  << " Child id: " << child << std::endl;
+	project_->addChildTask(parent, project_->getTaskFromId(child));
+	refreshTaskTable();
+}
+
+void MainWindow::deindentTaskSlot()
+{
+	int row = taskTable_->currentRow();
+
+	// No row selected:
+	if (row < 1 || row > taskTable_->rowCount())
+		return;
+
+	int child = taskTable_->item(row, 0)->text().toInt();
+	std::cout << "Deindenting task " << child << std::endl;
+
+	project_->removeChildTask(project_->getTaskFromId(child));
+	refreshTaskTable();
+}
+
+void MainWindow::changeTaskValues(int row, int column)
+{
+	std::cout << "item changed! row: " << row << " column: " << column << std::endl;
+
+	// No row selected:
+	if (row < 1 || row > taskTable_->rowCount())
+		return;
+
+	int id = taskTable_->item(row, 0)->text().toInt();
+	if (column == 1) {
+		std::cout << "Task name changed!" << std::endl;
+		project_->getTaskFromId(id)->setName(taskTable_->item(row, column)->text().toStdString());
+	} else if (column == 3) {
+		std::cout << "Duration changed!" << std::endl;
+		project_->getTaskFromId(id)->setDuration(taskTable_->item(row, column)->text().toInt());
+	}
+	refreshTaskTable();
+}
 
 
 void MainWindow::switchToResourceTab()
@@ -121,7 +202,9 @@ void MainWindow::switchToResourceTab()
         tab.setCurrentIndex(0);
         newTaskAction->setEnabled(false);
         deleteTaskAction->setEnabled(false);
-        newResourceAction->setEnabled(true);
+	indentTaskAction->setEnabled(false);
+	deindentTaskAction->setEnabled(false);
+	newResourceAction->setEnabled(true);
         deleteResourceAction->setEnabled(true);
         viewResourceAction->setEnabled(false);
         viewTaskAction->setEnabled(true);
@@ -132,7 +215,9 @@ void MainWindow::switchToTaskTab()
         tab.setCurrentIndex(1);
         newTaskAction->setEnabled(true);
         deleteTaskAction->setEnabled(true);
-        newResourceAction->setEnabled(false);
+	indentTaskAction->setEnabled(true);
+	deindentTaskAction->setEnabled(true);
+	newResourceAction->setEnabled(false);
         deleteResourceAction->setEnabled(false);
         viewResourceAction->setEnabled(true);
         viewTaskAction->setEnabled(false);
@@ -153,6 +238,7 @@ void MainWindow::createTaskTab()
     // Create left table:
     int numberOfColumns = 4;
     taskTable_ = new QTableWidget(0, 4);
+    connect(taskTable_, SIGNAL(cellChanged(int, int)), this, SLOT(changeTaskValues(int, int)));
     QStringList labels;
     labels.append("Id");
     labels.append("Name");
@@ -165,8 +251,8 @@ void MainWindow::createTaskTab()
     taskTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     // Set width of the three columns:
-    taskTable_->setColumnWidth(0, 60);
-    taskTable_->setColumnWidth(1, 70);
+    taskTable_->setColumnWidth(0, 50);
+    taskTable_->setColumnWidth(1, 80);
     taskTable_->setColumnWidth(2, 80);
     taskTable_->setColumnWidth(3, 70);
 
@@ -187,12 +273,7 @@ void MainWindow::createTaskTab()
 
     taskToolbar->setBaseSize(numberOfColumns * 70, 20);
 
-    deindentTaskAction= new QAction(tr("&Deindent"), this);
-    deindentTaskAction->setIcon(QIcon(":images/go-previous.png"));
     taskToolbar->addAction(deindentTaskAction);
-
-    indentTaskAction= new QAction(tr("&Indent"), this);
-    indentTaskAction->setIcon(QIcon(":images/go-next.png"));
     taskToolbar->addAction(indentTaskAction);
 
     QVBoxLayout* taskLeftLayout = new QVBoxLayout();
@@ -234,14 +315,14 @@ void MainWindow::createResourceTab()
     resourceTable_ = new QTableWidget(0, 3);
     QStringList labels;
     labels.append("Id");
-    labels.append("Name");
+    labels.append("Name/Group");
     labels.append("Role");
     resourceTable_->setHorizontalHeaderLabels(labels);
     resourceTable_->verticalHeader()->setVisible(false);
     resourceTable_->setMinimumWidth(numberOfColumns * 70);
     resourceTable_->setMaximumWidth(numberOfColumns * 70);
-    resourceTable_->setColumnWidth(0, 70);
-    resourceTable_->setColumnWidth(1, 70);
+    resourceTable_->setColumnWidth(0, 50);
+    resourceTable_->setColumnWidth(1, 90);
     resourceTable_->setColumnWidth(2, 70);
 
     // Create left scene:
@@ -347,6 +428,15 @@ void MainWindow::createMainMenu()
     deleteTaskAction = new QAction(tr("&Delete Task"), this);
     deleteTaskAction->setIcon(QIcon(":images/list-remove.svg"));
     editMenu->addAction(deleteTaskAction);
+
+    indentTaskAction= new QAction(tr("&Indent Task"), this);
+    indentTaskAction->setIcon(QIcon(":images/go-next.png"));
+    editMenu->addAction(indentTaskAction);
+
+    deindentTaskAction= new QAction(tr("&Deindent Task"), this);
+    deindentTaskAction->setIcon(QIcon(":images/go-previous.png"));
+    editMenu->addAction(deindentTaskAction);
+
 
     editMenu->addSeparator();
 

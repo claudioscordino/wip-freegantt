@@ -96,6 +96,9 @@ private slots:
 	void switchToResourceTab();
 	void newTaskSlot();
 	void removeTaskSlot();
+	void indentTaskSlot();
+	void deindentTaskSlot();
+	void changeTaskValues(int row, int column);
 };
 
 #endif // MAINWINDOW_HPP
