@@ -21,16 +21,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     tab(this)
 {
-    ui->setupUi(this);
-    createMainMenu();
-    createMainToolbar();
-    enableDisableMenu();
+	ui->setupUi(this);
+	createMainMenu();
+	createMainToolbar();
+	enableDisableMenu();
 
-    setWindowIcon(QIcon(":/images/gantt-hi.png"));
-    setWindowTitle("FreeGantt 0.2");
+	setWindowIcon(QIcon(":/images/gantt-hi.png"));
+	setWindowTitle("FreeGantt 0.2");
 
-    connect(&tab, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
-    connect(newTaskAction, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
+	connect(&tab, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
+	connect(newTaskAction, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
+	connect(deleteTaskAction, SIGNAL(triggered()), this, SLOT(removeTaskSlot()));
 }
 
 //========== TAB ===========================
@@ -38,7 +39,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::refreshTaskTable()
 {
-	// Delete table and items
+	// Delete table and items:
+	for (int r = taskTable_->rowCount(); r >= 0; --r)
+		taskTable_->removeRow(r);
+
 	for (int i = 0; i < project_->getTasksNumber(); ++i){
 		Task* t = project_->getTaskSequentially(i);
 
@@ -46,7 +50,7 @@ void MainWindow::refreshTaskTable()
 
 		QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
 		newItemTaskId->setTextAlignment(Qt::AlignCenter);
-		newItemTaskId->setText(QString::number(t->getId()));
+		newItemTaskId->setText(QString::fromStdString(t->getId()));
 		taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
 
 		QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
@@ -75,7 +79,7 @@ void MainWindow::refreshTaskTable()
 
 			QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
 			newItemTaskId->setTextAlignment(Qt::AlignCenter);
-			newItemTaskId->setText(QString::number(ch->getId()));
+			newItemTaskId->setText(QString::fromStdString(ch->getId()));
 			taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
 
 			QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
@@ -101,6 +105,15 @@ void MainWindow::newTaskSlot()
 	project_->addTask(new Task("New task"));
 	refreshTaskTable();
 }
+
+void MainWindow::removeTaskSlot()
+{
+	int row = taskTable_->currentRow();
+	int id = taskTable_->item(row, 0)->text().toInt();
+	project_->removeTask(id);
+	refreshTaskTable();
+}
+
 
 
 void MainWindow::switchToResourceTab()
