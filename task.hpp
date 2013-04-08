@@ -7,26 +7,16 @@
 
 #include "calendar.hpp"
 #include "tasks.hpp"
+#include "object.hpp"
 
-class Task
+class Task: public Object
 {
 public:
 	Task(const std::string& name):
-	    name_(name),
+	    Object(name),
 	    parent_(0),
 	    begin_(QDate::currentDate()),
-	    duration_(0){
-		id_ = next_id_;
-		next_id_++;
-	}
-
-	inline std::string getName() const {
-		return name_;
-	}
-
-	inline void setName(const std::string& name ) {
-		name_ = name;
-	}
+	    duration_(0){}
 
 	inline QDate getBegin() const {
 		return begin_;
@@ -95,10 +85,6 @@ public:
 
 	QDate getEnd();
 
-	inline int getId() const{
-		return id_;
-	}
-
 	inline int getChildrenNumber() const{
 		return children_.getTasksNumber();
 	}
@@ -119,9 +105,6 @@ public:
 private:
 	Task();
 
-	/// Name of the task:
-	std::string name_;
-
 	/// Children of the task:
 	Tasks children_;
 
@@ -140,11 +123,7 @@ private:
 	/// Stop days:
 	Calendar stop_days_;
 
-	/// Task id:
-	unsigned int id_;
 
-	/// Id generator;
-	static int next_id_;
 };
 
 #endif // TASK_HPP

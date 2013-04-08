@@ -1,6 +1,5 @@
 #include "task.hpp"
 
-int Task::next_id_ = 0;
 
 QDate Task::getEnd()
 {

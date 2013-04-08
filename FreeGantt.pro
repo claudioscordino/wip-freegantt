@@ -15,7 +15,8 @@ HEADERS += allocation.hpp \
            task.hpp \
     calendar.hpp \
     tasks.hpp \
-    resources.hpp
+    resources.hpp \
+    object.hpp
 FORMS += mainwindow.ui
 SOURCES += allocation.cpp \
            main.cpp \
@@ -25,5 +26,6 @@ SOURCES += allocation.cpp \
            task.cpp \
     calendar.cpp \
     tasks.cpp \
-    resources.cpp
+    resources.cpp \
+    object.cpp
 RESOURCES += freegantt.qrc
