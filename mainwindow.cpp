@@ -76,13 +76,13 @@ void MainWindow::refreshTaskTable()
 		newItemDuration->setText(QString::number(t->getDuration()));
 		taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
 
-		if (t->getChildrenNumber() > 0){
+		if (t->getChildrenSize() > 0){
 			QFont font = newItemTaskName->font();
 			font.setBold(true);
 			newItemTaskName->setFont(font);
 
 			// Print children:
-			for (int c = 0; c < t->getChildrenNumber(); ++c){
+			for (int c = 0; c < t->getChildrenSize(); ++c){
 				Task* ch = t->getChildrenSequentially(c);
 				std::cout << "Task " << t->getId() << " has child " << ch->getId() << std::endl;
 

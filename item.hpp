@@ -1,17 +1,20 @@
-#ifndef OBJECT_HPP
-#define OBJECT_HPP
+#ifndef ITEM_HPP
+#define ITEM_HPP
 
 #include <string>
+#include <vector>
 
-class Object
+#include "item.hpp"
+
+
+class Item
 {
 public:
-	Object(const std::string& name):
+	Item(const std::string& name):
 		name_(name){
 		id_ = next_id_;
 		next_id_++;
 	}
-
 
 	inline std::string getName() const {
 		return name_;
@@ -34,6 +37,7 @@ private:
 
 	/// Id generator;
 	static int next_id_;
+
 };
 
 #endif // OBJECT_HPP

@@ -3,16 +3,17 @@
 
 #include <string>
 
-#include "object.hpp"
+#include "hierarchitem.hpp"
+#include "set.hpp"
 
-class Resource: public Object
+class Resource: public HierarchItem
 {
 public:
 	Resource(const std::string& name, const std::string& role):
-	    Object(name), role_(role){}
+	    HierarchItem(name), role_(role){}
 
 	Resource(const std::string& name):
-	    Object(name), role_("") {}
+	    HierarchItem(name), role_("") {}
 
 	inline std::string getRole () const{
 		return role_;
