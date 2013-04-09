@@ -503,7 +503,7 @@ void MainWindow::changeTaskValues(int row, int column)
 	std::cout << "item changed! row: " << row << " column: " << column << std::endl;
 
 	// No row selected:
-	if (row < 1 || row > taskTable_->rowCount())
+	if (row < 0 || row > taskTable_->rowCount())
 		return;
 
 	int id = taskTable_->item(row, 0)->text().toInt();
@@ -529,6 +529,7 @@ void MainWindow::createResourceTab()
 	// Create left table:
 	int numberOfColumns = 3;
 	resourceTable_ = new QTableWidget(0, 3);
+	connect(resourceTable_, SIGNAL(cellChanged(int, int)), this, SLOT(changeResourceValues(int, int)));
 	QStringList labels;
 	labels.append("Id");
 	labels.append("Name/Group");
@@ -746,7 +747,7 @@ void MainWindow::changeResourceValues(int row, int column)
 	std::cout << "item changed! row: " << row << " column: " << column << std::endl;
 
 	// No row selected:
-	if (row < 1 || row > resourceTable_->rowCount())
+	if (row < 0 || row > resourceTable_->rowCount())
 		return;
 
 	int id = resourceTable_->item(row, 0)->text().toInt();
