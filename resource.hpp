@@ -23,6 +23,10 @@ public:
 		role_ = role;
 	}
 
+	virtual inline Resource* getChildrenSequentially(int position) const {
+		return static_cast<Resource*> (HierarchItem::getChildrenSequentially(position));
+	}
+
 private:
 	Resource();
 

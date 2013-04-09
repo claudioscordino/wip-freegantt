@@ -24,7 +24,8 @@ class MainWindow : public QMainWindow
 public:
 	explicit MainWindow(QWidget *parent = 0);
 	void refreshTaskTable();
-		~MainWindow();
+	void refreshResourceTable();
+	~MainWindow();
 
 private:
 
@@ -64,6 +65,8 @@ private:
 	// Main toolbar
 	QAction* indentTaskAction;
 	QAction* deindentTaskAction;
+	QAction* indentResourceAction;
+	QAction* deindentResourceAction;
 
 	QToolBar* mainToolbar;
 
@@ -99,6 +102,11 @@ private slots:
 	void indentTaskSlot();
 	void deindentTaskSlot();
 	void changeTaskValues(int row, int column);
+	void newResourceSlot();
+	void removeResourceSlot();
+	void indentResourceSlot();
+	void deindentResourceSlot();
+	void changeResourceValues(int row, int column);
 };
 
 #endif // MAINWINDOW_HPP

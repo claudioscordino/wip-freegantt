@@ -46,6 +46,23 @@ public:
 		return resources_.getName(id);
 	}
 
+	inline int getResourcesSize() const {
+		return resources_.getSize();
+	}
+
+	inline Resource* getResourcesSequentially(int position){
+		return static_cast<Resource*>(resources_.getSequentially(position));
+	}
+
+	inline bool addChildResource(int id, Resource* child){
+		return resources_.addChild(id, child);
+	}
+
+	inline bool removeChildResource(Resource* child){
+		return resources_.removeChild(child);
+	}
+
+
 
 
 	// Holidays::
@@ -146,6 +163,11 @@ public:
 		return t->getEnd();
 	}
 
+	inline int getTasksSize() const {
+		return tasks_.getSize();
+	}
+
+
 	//Files:
 
 	inline bool loadFile(const std::string& name){
@@ -153,11 +175,6 @@ public:
 		// FIXME
 		return true;
 	}
-
-	inline int getTasksNumber() const {
-		return tasks_.getSize();
-	}
-
 
 	// Allocation:
 
