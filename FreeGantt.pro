@@ -26,5 +26,6 @@ SOURCES += allocation.cpp \
            task.cpp \
     calendar.cpp \
     item.cpp \
-    hierarchitem.cpp
+    hierarchitem.cpp \
+    set.cpp
 RESOURCES += freegantt.qrc

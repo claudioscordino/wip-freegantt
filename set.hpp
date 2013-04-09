@@ -2,107 +2,41 @@
 #define SET_HPP
 
 #include <iostream>
+#include <vector>
 
-template <class T>
+class HierarchItem;
+
 class Set
 {
 public:
 	Set(){}
 
-	inline T* getFromId(int id) const {
-		for (typename std::vector<T*>::const_iterator i = objects_.begin();
-		     i != objects_.end(); ++i)
-			if ((*i)->getId() == id)
-				return *i;
-		return 0;
-	}
+	HierarchItem* getFromId(int id) const;
 
-	inline T* getSequentially(int position) const {
-		return objects_.at(position);
-	}
+	HierarchItem* getSequentially(int position) const;
 
-	inline bool remove(int id){
-		for (typename std::vector<T*>::iterator i = objects_.begin();
-		     i != objects_.end(); ++i)
-			if ((*i)->getId() == id){
-				T* t = (*i);
-				// In case of parent, reparent the children:
-				for (int ch = 0; ch < t->getChildrenSize(); ++ch)
-					t->getChildrenSequentially(ch)->setParent(0);
-				objects_.erase(i);
-				return true;
-			}
-		return false;
-	}
+	bool remove(int id);
 
+	bool add(HierarchItem* t);
 
-	inline bool add(T* t){
-		for (typename std::vector<T*>::iterator i = objects_.begin();
-		     i != objects_.end(); ++i)
-			if ((*i)->getId() == t->getId())
-				return false;
-		objects_.push_back(t);
-		return true;
-	}
+	bool addChild(int id, HierarchItem* child);
 
+	HierarchItem* getParent(int child_id) const;
 
-	inline bool addChild(int id, T* child) {
-		T* t = getFromId(id);
-		if (t == 0)
-			return false;
-		return t->addChild(child);
-	}
+	bool removeChild(int child_id);
 
-	inline T* getParent(int child_id) const {
-		T* t = getFromId(child_id);
-		if (t == 0)
-			return 0;
-		return t->getParent();
-	}
+	bool setName(int id, const std::string& newname);
 
-	inline bool removeChild(int child_id){
-		for (typename std::vector<T*>::iterator i = objects_.begin();
-		     i != objects_.end(); ++i){
-			for (int c = 0; c < (*i)->getChildrenSize(); ++c){
-				std::cout << "Found child" << (*i)->getChildrenSequentially(c)->getId() << std::endl;
-				if ((*i)->getChildrenSequentially(c)->getId() == child_id){
-					(*i)->removeChild((*i)->getChildrenSequentially(c));
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+	std::string getName(int id) const;
 
-	inline bool setName(int id, const std::string& newname){
-		T* t = getFromId(id);
-		if (t == 0)
-			return false;
-		t->setName(newname);
-		return true;
-	}
+	bool removeChild(HierarchItem* child);
 
-	inline std::string getName(int id) const {
-		T* t = getFromId(id);
-		if (t == 0)
-			return "";
-		return t->getName();
-	}
+	bool remove(HierarchItem* t);
 
-	inline bool removeChild(T* child){
-		return removeChild(child->getId());
-	}
-
-	inline bool remove(T* t){
-		return remove(t->getId());
-	}
-
-	inline int getSize() const{
-		return objects_.size();
-	}
+	int getSize() const;
 
 private:
-	std::vector<T*> objects_;
+	std::vector<HierarchItem*> objects_;
 
 };
 

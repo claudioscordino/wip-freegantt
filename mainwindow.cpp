@@ -146,18 +146,23 @@ void MainWindow::indentTaskSlot()
 
 	int child = taskTable_->item(row, 0)->text().toInt();
 
-	// Task is already a child:
-	if (project_->getTaskFromId(child) == 0)
-		return;
+	std::cerr << " Child id: " << child << std::endl;
 
-	// Iterate to find the parent:
+	// Task is already a child:
+	if (project_->getParentTask(child) != 0) {
+		std::cerr << " Child already has a parent" << std::endl;
+		return;
+	}
+
+	std::cerr << "Child does not have parent" << std::endl;
+
+
+	// Iterate backward to find the new parent:
 	while (project_->getTaskFromId(taskTable_->item(row-1, 0)->text().toInt())->getParent() != 0)
 		row--;
-
 	int parent = taskTable_->item(row-1, 0)->text().toInt();
+	std::cerr << "Parent id: " << parent << std::endl;
 
-	std::cout << "Parent id: " << parent
-		  << " Child id: " << child << std::endl;
 	project_->addChildTask(parent, project_->getTaskFromId(child));
 	refreshTaskTable();
 }

@@ -11,7 +11,7 @@ class HierarchItem: public Item
 {
 public:
 	HierarchItem(const std::string& name):
-		Item(name){}
+		Item(name), parent_(0){}
 
 	inline void setParent(HierarchItem* p){
 		parent_ = p;
@@ -30,17 +30,19 @@ public:
 	}
 
 	inline bool addChild(HierarchItem* child) {
+		child->setParent(this);
 		return children_.add(child);
 	}
 
 	inline bool removeChild(HierarchItem* child){
+		child->setParent(0);
 		return children_.remove(child);
 	}
 
 private:
 
 	/// Children of the object:
-	Set<HierarchItem> children_;
+	Set children_;
 
 	/// Parent in case it is a child
 	HierarchItem* parent_;

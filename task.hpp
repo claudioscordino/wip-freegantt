@@ -73,7 +73,7 @@ private:
 	Task();
 
 	/// Predecessors of the task:
-	Set<Task> predecessors_;
+	Set predecessors_;
 
 	/// Begin of the task:
 	QDate begin_;

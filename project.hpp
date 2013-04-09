@@ -17,7 +17,7 @@ public:
 	// Resources:
 
 	inline Resource* getResourceFromId(int id){
-		return resources_.getFromId(id);
+		return static_cast<Resource*> (resources_.getFromId(id));
 	}
 
 	inline bool removeResource(int id){
@@ -161,25 +161,33 @@ public:
 
 	// Allocation:
 
-	inline void allocate(int task_id, int resource_id, int percentage){
+	inline void allocate(int task_id, int resource_id, int percentage) {
 		allocations_.allocate(task_id, resource_id, percentage);
 	}
 
-	inline bool deallocate(int task_id, int resource_id){
+	inline bool deallocate(int task_id, int resource_id) {
 		return allocations_.deallocate(task_id, resource_id);
 	}
 
-	inline std::vector<int> getTaskResources(int task_id){
+	inline std::vector<int> getTaskResources(int task_id) {
 		return allocations_.getTaskResources(task_id);
+	}
+
+	inline Task* getParentTask(int child_task_id) const {
+		return static_cast<Task*>(tasks_.getParent(child_task_id));
+	}
+
+	inline Resource* getParentResource(int child_resource_id) const {
+		return static_cast<Resource*>(resources_.getParent(child_resource_id));
 	}
 
 
 private:
 	/// List of resources:
-	Set<Resource> resources_;
+	Set resources_;
 
 	/// List of tasks:
-	Set<Task> tasks_;
+	Set tasks_;
 
 	/// List of holidays:
 	Calendar holidays_;
