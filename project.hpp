@@ -21,6 +21,12 @@ public:
 	}
 
 	inline bool removeResource(int id){
+		Resource* r = static_cast<Resource*>(resources_.getFromId(id));
+		// In case of child, remove from parent's children:
+		if (r->getParent() != 0)
+			r->getParent()->removeChild(r);
+		// Then, remove the resource:
+
 		return resources_.remove(id);
 	}
 

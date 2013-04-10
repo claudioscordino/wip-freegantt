@@ -246,7 +246,7 @@ bool MainWindow::exitClicked()
 void MainWindow::aboutClicked()
 {
 	QMessageBox::about(this, tr("About FreeGantt"),
-			   "<h2>FreeGantt 0.2</h2>"
+			   "<h2>FreeGantt 0.3</h2>"
 			   "<p>Copyright &copy; 2013 Claudio Scordino</p>"
 			   "<p> FreeGantt is a small application to draw "
 			   "Gantt diagrams.</p>");
@@ -373,29 +373,35 @@ void MainWindow::refreshTaskTable()
 		taskTable_->insertRow(taskTable_->rowCount());
 
 		QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
-		newItemTaskId->setTextAlignment(Qt::AlignCenter);
+		newItemTaskId->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 		newItemTaskId->setText(QString::number(t->getId()));
 		taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
 
 		QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
-		newItemTaskId->setTextAlignment(Qt::AlignLeft);
+		newItemTaskName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		newItemTaskName->setText(QString::fromStdString(t->getName()));
 		taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
 
-		QTableWidgetItem *newItemBegin = new QTableWidgetItem();
-		newItemBegin->setTextAlignment(Qt::AlignCenter);
-		newItemBegin->setText(t->getBegin().toString("dd.MM.yyyy"));
-		taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
+		if (t->getChildrenSize() == 0){
 
-		QTableWidgetItem *newItemDuration = new QTableWidgetItem();
-		newItemDuration->setTextAlignment(Qt::AlignCenter);
-		newItemDuration->setText(QString::number(t->getDuration()));
-		taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
+			// In case it has no children, print Begin and Duration:
 
-		if (t->getChildrenSize() > 0){
+			QTableWidgetItem *newItemBegin = new QTableWidgetItem();
+			newItemBegin->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+			newItemBegin->setText(t->getBegin().toString("dd.MM.yyyy"));
+			taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
+
+			QTableWidgetItem *newItemDuration = new QTableWidgetItem();
+			newItemDuration->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
+			newItemDuration->setText(QString::number(t->getDuration()));
+			taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
+
+		} else {
 			QFont font = newItemTaskName->font();
 			font.setBold(true);
 			newItemTaskName->setFont(font);
+			newItemTaskId->setFont(font);
+
 
 			// Print children:
 			for (int c = 0; c < t->getChildrenSize(); ++c){
@@ -406,12 +412,12 @@ void MainWindow::refreshTaskTable()
 				taskTable_->insertRow(taskTable_->rowCount());
 
 				QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
-				newItemTaskId->setTextAlignment(Qt::AlignCenter);
+				newItemTaskId->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 				newItemTaskId->setText(QString::number(ch->getId()));
 				taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
 
 				QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
-				newItemTaskId->setTextAlignment(Qt::AlignLeft);
+				newItemTaskName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
 				QFont font = newItemTaskName->font();
 				font.setItalic(true);
@@ -421,12 +427,12 @@ void MainWindow::refreshTaskTable()
 				taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
 
 				QTableWidgetItem *newItemBegin = new QTableWidgetItem();
-				newItemBegin->setTextAlignment(Qt::AlignCenter);
+				newItemBegin->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 				newItemBegin->setText(ch->getBegin().toString("dd.MM.yyyy"));
 				taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
 
 				QTableWidgetItem *newItemDuration = new QTableWidgetItem();
-				newItemDuration->setTextAlignment(Qt::AlignCenter);
+				newItemDuration->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 				newItemDuration->setText(QString::number(ch->getDuration()));
 				taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
 			}
@@ -538,6 +544,8 @@ void MainWindow::createResourceTab()
 	resourceTable_->verticalHeader()->setVisible(false);
 	resourceTable_->setMinimumWidth(numberOfColumns * 70);
 	resourceTable_->setMaximumWidth(numberOfColumns * 70);
+	resourceTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+
 	resourceTable_->setColumnWidth(0, 50);
 	resourceTable_->setColumnWidth(1, 90);
 	resourceTable_->setColumnWidth(2, 70);
@@ -626,17 +634,17 @@ void MainWindow::refreshResourceTable()
 		resourceTable_->insertRow(resourceTable_->rowCount());
 
 		QTableWidgetItem *newItemResourceId = new QTableWidgetItem();
-		newItemResourceId->setTextAlignment(Qt::AlignCenter);
+		newItemResourceId->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 		newItemResourceId->setText(QString::number(t->getId()));
 		resourceTable_->setItem(resourceTable_->rowCount()-1, 0, newItemResourceId);
 
 		QTableWidgetItem *newItemResourceName = new QTableWidgetItem();
-		newItemResourceId->setTextAlignment(Qt::AlignLeft);
+		newItemResourceName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		newItemResourceName->setText(QString::fromStdString(t->getName()));
 		resourceTable_->setItem(resourceTable_->rowCount()-1, 1, newItemResourceName);
 
 		QTableWidgetItem *newItemResourceRole = new QTableWidgetItem();
-		newItemResourceRole->setTextAlignment(Qt::AlignLeft);
+		newItemResourceRole->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		newItemResourceRole->setText(QString::fromStdString(t->getRole()));
 		resourceTable_->setItem(resourceTable_->rowCount()-1, 2, newItemResourceRole);
 
@@ -645,22 +653,23 @@ void MainWindow::refreshResourceTable()
 			QFont font = newItemResourceName->font();
 			font.setBold(true);
 			newItemResourceName->setFont(font);
+			newItemResourceId->setFont(font);
+			newItemResourceRole->setFont(font);
 
 			// Print children:
 			for (int c = 0; c < t->getChildrenSize(); ++c){
 				Resource* ch = t->getChildrenSequentially(c);
 				std::cout << "Resource " << t->getId() << " has child " << ch->getId() << std::endl;
 
-
 				resourceTable_->insertRow(resourceTable_->rowCount());
 
 				QTableWidgetItem *newItemResourceId = new QTableWidgetItem();
-				newItemResourceId->setTextAlignment(Qt::AlignCenter);
+				newItemResourceId->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 				newItemResourceId->setText(QString::number(ch->getId()));
 				resourceTable_->setItem(resourceTable_->rowCount()-1, 0, newItemResourceId);
 
 				QTableWidgetItem *newItemResourceName = new QTableWidgetItem();
-				newItemResourceId->setTextAlignment(Qt::AlignLeft);
+				newItemResourceName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
 				QFont font = newItemResourceName->font();
 				font.setItalic(true);
@@ -670,8 +679,8 @@ void MainWindow::refreshResourceTable()
 				resourceTable_->setItem(resourceTable_->rowCount()-1, 1, newItemResourceName);
 
 				QTableWidgetItem *newItemResourceRole = new QTableWidgetItem();
-				newItemResourceRole->setTextAlignment(Qt::AlignLeft);
-				newItemResourceRole->setText(QString::fromStdString(t->getRole()));
+				newItemResourceRole->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+				newItemResourceRole->setText(QString::fromStdString(ch->getRole()));
 				resourceTable_->setItem(resourceTable_->rowCount()-1, 2, newItemResourceRole);
 			}
 		}
@@ -692,6 +701,7 @@ void MainWindow::removeResourceSlot()
 	if (row < 0 || row > resourceTable_->rowCount())
 		return;
 	int id = resourceTable_->item(row, 0)->text().toInt();
+	std::cerr << "Row: " << row << " Id: " << id << std::endl;
 	project_->removeResource(id);
 	refreshResourceTable();
 }
