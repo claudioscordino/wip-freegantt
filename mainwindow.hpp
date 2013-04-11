@@ -101,12 +101,13 @@ private slots:
 	void removeTaskSlot();
 	void indentTaskSlot();
 	void deindentTaskSlot();
-	void changeTaskValues(int row, int column);
+	void taskValueChanged(int row, int column);
+	void taskValueClicked(int row, int column);
 	void newResourceSlot();
 	void removeResourceSlot();
 	void indentResourceSlot();
 	void deindentResourceSlot();
-	void changeResourceValues(int row, int column);
+	void resourceValueChanged(int row, int column);
 };
 
 #endif // MAINWINDOW_HPP

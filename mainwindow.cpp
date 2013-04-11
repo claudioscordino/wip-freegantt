@@ -11,6 +11,7 @@
 #include <QGraphicsView>
 #include <QGraphicsLineItem>
 #include <QGraphicsRectItem>
+#include <QCalendarWidget>
 #include <iostream>
 
 // ==============================================
@@ -212,10 +213,12 @@ void MainWindow::createMainToolbar()
 
 void MainWindow::newProjectSlot()
 {
-	project_ = new Project();
-	enableDisableMenu();
-	createResourceTab();
-	createTaskTab();
+	if (project_ == 0) {
+		project_ = new Project();
+		enableDisableMenu();
+		createResourceTab();
+		createTaskTab();
+	}
 	switchToTaskTab();
 }
 
@@ -270,7 +273,9 @@ void MainWindow::createTaskTab()
 	// Create left table:
 	int numberOfColumns = 4;
 	taskTable_ = new QTableWidget(0, 4);
-	connect(taskTable_, SIGNAL(cellChanged(int, int)), this, SLOT(changeTaskValues(int, int)));
+	taskTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	connect(taskTable_, SIGNAL(cellChanged(int, int)), this, SLOT(taskValueChanged(int, int)));
+	connect(taskTable_, SIGNAL(cellClicked(int,int)), this, SLOT(taskValueClicked(int, int)));
 	QStringList labels;
 	labels.append("Id");
 	labels.append("Name");
@@ -427,6 +432,7 @@ void MainWindow::refreshTaskTable()
 				taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
 
 				QTableWidgetItem *newItemBegin = new QTableWidgetItem();
+				//QDateEdit* newItemBegin = new QDateEdit();
 				newItemBegin->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
 				newItemBegin->setText(ch->getBegin().toString("dd.MM.yyyy"));
 				taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
@@ -504,7 +510,7 @@ void MainWindow::deindentTaskSlot()
 	refreshTaskTable();
 }
 
-void MainWindow::changeTaskValues(int row, int column)
+void MainWindow::taskValueChanged(int row, int column)
 {
 	std::cout << "item changed! row: " << row << " column: " << column << std::endl;
 
@@ -513,14 +519,36 @@ void MainWindow::changeTaskValues(int row, int column)
 		return;
 
 	int id = taskTable_->item(row, 0)->text().toInt();
-	if (column == 1) {
+
+	switch(column) {
+	case 1:
 		std::cout << "Task name changed!" << std::endl;
 		project_->getTaskFromId(id)->setName(taskTable_->item(row, column)->text().toStdString());
-	} else if (column == 3) {
+		break;
+	case 3:
 		std::cout << "Duration changed!" << std::endl;
 		project_->getTaskFromId(id)->setDuration(taskTable_->item(row, column)->text().toInt());
+		break;
 	}
 	refreshTaskTable();
+}
+
+
+void MainWindow::taskValueClicked(int row, int column)
+{
+	std::cout << "item clicked! row: " << row << " column: " << column << std::endl;
+
+	// No row selected:
+	if (row < 0 || row > taskTable_->rowCount())
+		return;
+
+	if (column == 2){
+		int id = taskTable_->item(row, 0)->text().toInt();
+		QCalendarWidget* cal = new QCalendarWidget(NULL);
+		//connect (cal, SIGNAL(selectionChanged()), this, SLOT()
+		cal->setHidden(false);
+		refreshTaskTable();
+	}
 }
 
 // ==============================================
@@ -535,7 +563,8 @@ void MainWindow::createResourceTab()
 	// Create left table:
 	int numberOfColumns = 3;
 	resourceTable_ = new QTableWidget(0, 3);
-	connect(resourceTable_, SIGNAL(cellChanged(int, int)), this, SLOT(changeResourceValues(int, int)));
+	resourceTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	connect(resourceTable_, SIGNAL(cellChanged(int, int)), this, SLOT(resourceValueChanged(int, int)));
 	QStringList labels;
 	labels.append("Id");
 	labels.append("Name/Group");
@@ -752,7 +781,8 @@ void MainWindow::deindentResourceSlot()
 	refreshResourceTable();
 }
 
-void MainWindow::changeResourceValues(int row, int column)
+
+void MainWindow::resourceValueChanged(int row, int column)
 {
 	std::cout << "item changed! row: " << row << " column: " << column << std::endl;
 
