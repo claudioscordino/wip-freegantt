@@ -9,6 +9,7 @@
 #include <vector>
 #include <QCloseEvent>
 #include <QVBoxLayout>
+#include <QCalendarWidget>
 
 #include "project.hpp"
 
@@ -82,6 +83,9 @@ private:
 	void createResourceTab();
 	void createTaskTab();
 
+	QCalendarWidget calendar_;
+	int calendarTaskId_;
+
 protected:
 	inline void closeEvent(QCloseEvent* ){
 		exitClicked();
@@ -108,6 +112,7 @@ private slots:
 	void indentResourceSlot();
 	void deindentResourceSlot();
 	void resourceValueChanged(int row, int column);
+	void changeTaskBegin();
 };
 
 #endif // MAINWINDOW_HPP

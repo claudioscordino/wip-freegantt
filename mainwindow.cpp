@@ -11,7 +11,6 @@
 #include <QGraphicsView>
 #include <QGraphicsLineItem>
 #include <QGraphicsRectItem>
-#include <QCalendarWidget>
 #include <iostream>
 
 // ==============================================
@@ -25,7 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	taskTable_(0),
 	resourceTable_(0),
 	ui(new Ui::MainWindow),
-	tab(this)
+	tab(this),
+	calendarTaskId_(0)
 {
 	ui->setupUi(this);
 	createMainMenu();
@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	setWindowIcon(QIcon(":/images/gantt-hi.png"));
 	setWindowTitle("FreeGantt 0.3");
+	calendar_.setHidden(true);
 
 	connect(&tab, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
 
@@ -275,7 +276,7 @@ void MainWindow::createTaskTab()
 	taskTable_ = new QTableWidget(0, 4);
 	taskTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	connect(taskTable_, SIGNAL(cellChanged(int, int)), this, SLOT(taskValueChanged(int, int)));
-	connect(taskTable_, SIGNAL(cellClicked(int,int)), this, SLOT(taskValueClicked(int, int)));
+	connect(taskTable_, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(taskValueClicked(int, int)));
 	QStringList labels;
 	labels.append("Id");
 	labels.append("Name");
@@ -534,6 +535,19 @@ void MainWindow::taskValueChanged(int row, int column)
 }
 
 
+void MainWindow::changeTaskBegin()
+{
+	if (calendar_.isHidden() == false) {
+		std::cerr << "Changing beginning for Task: " << calendarTaskId_ << std::endl;
+		project_->setTaskBeginning(calendarTaskId_, calendar_.selectedDate());
+		std::cerr << "-2-" << std::endl;
+		calendar_.setHidden(true);
+		std::cerr << "New date: " << project_->getTaskFromId(calendarTaskId_)->getBegin().toString("dd.MM.yyyy").toStdString() << std::endl;
+		refreshTaskTable();
+	}
+}
+
+
 void MainWindow::taskValueClicked(int row, int column)
 {
 	std::cout << "item clicked! row: " << row << " column: " << column << std::endl;
@@ -542,12 +556,12 @@ void MainWindow::taskValueClicked(int row, int column)
 	if (row < 0 || row > taskTable_->rowCount())
 		return;
 
-	if (column == 2){
+	if ((column == 2) && (calendar_.isHidden() == true)){
 		int id = taskTable_->item(row, 0)->text().toInt();
-		QCalendarWidget* cal = new QCalendarWidget(NULL);
-		//connect (cal, SIGNAL(selectionChanged()), this, SLOT()
-		cal->setHidden(false);
-		refreshTaskTable();
+		calendarTaskId_ = id;
+		calendar_.setSelectedDate(project_->getTaskFromId(id)->getBegin());
+		calendar_.setHidden(false);
+		connect (&calendar_, SIGNAL(selectionChanged()), this, SLOT(changeTaskBegin()));
 	}
 }
 
