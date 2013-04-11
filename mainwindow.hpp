@@ -28,8 +28,36 @@ public:
 	void refreshResourceTable();
 	~MainWindow();
 
-private:
 
+protected:
+	inline void closeEvent(QCloseEvent* ){
+		exitClicked();
+	}
+
+private slots:
+	bool saveProject();
+	bool exitClicked();
+	void newProjectSlot();
+	bool saveClicked(){return true;}
+	void openClicked();
+	void aboutClicked();
+	void switchTab(int tab);
+	void switchToTaskTab();
+	void switchToResourceTab();
+	void newTaskSlot();
+	void removeTaskSlot();
+	void indentTaskSlot();
+	void deindentTaskSlot();
+	void taskValueChanged(int row, int column);
+	void taskValueClicked(int row, int column);
+	void newResourceSlot();
+	void removeResourceSlot();
+	void indentResourceSlot();
+	void deindentResourceSlot();
+	void resourceValueChanged(int row, int column);
+	void changeTaskBegin();
+
+private:
 	Project* project_;
 	QTableWidget* taskTable_;
 	QTableWidget* resourceTable_;
@@ -85,34 +113,6 @@ private:
 
 	QCalendarWidget calendar_;
 	int calendarTaskId_;
-
-protected:
-	inline void closeEvent(QCloseEvent* ){
-		exitClicked();
-	}
-
-private slots:
-	bool saveProject();
-	bool exitClicked();
-	void newProjectSlot();
-	bool saveClicked(){return true;}
-	void openClicked();
-	void aboutClicked();
-	void switchTab(int tab);
-	void switchToTaskTab();
-	void switchToResourceTab();
-	void newTaskSlot();
-	void removeTaskSlot();
-	void indentTaskSlot();
-	void deindentTaskSlot();
-	void taskValueChanged(int row, int column);
-	void taskValueClicked(int row, int column);
-	void newResourceSlot();
-	void removeResourceSlot();
-	void indentResourceSlot();
-	void deindentResourceSlot();
-	void resourceValueChanged(int row, int column);
-	void changeTaskBegin();
 };
 
 #endif // MAINWINDOW_HPP

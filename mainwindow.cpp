@@ -272,7 +272,6 @@ MainWindow::~MainWindow()
 void MainWindow::createTaskTab()
 {
 	// Create left table:
-	int numberOfColumns = 4;
 	taskTable_ = new QTableWidget(0, 4);
 	taskTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	taskTable_->setColumnHidden(0, true);
@@ -561,22 +560,22 @@ void MainWindow::taskValueClicked(int row, int column)
 		int id = taskTable_->item(row, 0)->text().toInt();
 		calendarTaskId_ = id;
 		calendar_.setSelectedDate(project_->getTaskFromId(id)->getBegin());
+		calendar_.setWindowTitle(QString("Select begin date"));
 		calendar_.setHidden(false);
 		connect (&calendar_, SIGNAL(selectionChanged()), this, SLOT(changeTaskBegin()));
 	}
 }
 
+
+
+
 // ==============================================
 //		RESOURCES
 // ==============================================
 
-
-
-
 void MainWindow::createResourceTab()
 {
 	// Create left table:
-	int numberOfColumns = 3;
 	resourceTable_ = new QTableWidget(0, 3);
 	resourceTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	resourceTable_->setColumnHidden(0, true);
@@ -734,11 +733,13 @@ void MainWindow::refreshResourceTable()
 
 }
 
+
 void MainWindow::newResourceSlot()
 {
 	project_->addResource(new Resource("New resource"));
 	refreshResourceTable();
 }
+
 
 void MainWindow::removeResourceSlot()
 {
@@ -750,6 +751,7 @@ void MainWindow::removeResourceSlot()
 	project_->removeResource(id);
 	refreshResourceTable();
 }
+
 
 void MainWindow::indentResourceSlot()
 {
@@ -781,6 +783,7 @@ void MainWindow::indentResourceSlot()
 	project_->addChildResource(parent, project_->getResourceFromId(child));
 	refreshResourceTable();
 }
+
 
 void MainWindow::deindentResourceSlot()
 {
