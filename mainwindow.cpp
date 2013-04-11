@@ -275,6 +275,7 @@ void MainWindow::createTaskTab()
 	int numberOfColumns = 4;
 	taskTable_ = new QTableWidget(0, 4);
 	taskTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	taskTable_->setColumnHidden(0, true);
 	connect(taskTable_, SIGNAL(cellChanged(int, int)), this, SLOT(taskValueChanged(int, int)));
 	connect(taskTable_, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(taskValueClicked(int, int)));
 	QStringList labels;
@@ -284,8 +285,8 @@ void MainWindow::createTaskTab()
 	labels.append("Duration");
 	taskTable_->setHorizontalHeaderLabels(labels);
 	taskTable_->verticalHeader()->setVisible(false);
-	taskTable_->setMinimumWidth(numberOfColumns * 70);
-	taskTable_->setMaximumWidth(numberOfColumns * 70);
+	taskTable_->setMinimumWidth(230);
+	taskTable_->setMaximumWidth(230);
 	taskTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	// Set width of the three columns:
@@ -309,7 +310,7 @@ void MainWindow::createTaskTab()
 	taskToolbar->addAction(deleteTaskAction);
 	taskToolbar->addSeparator();
 
-	taskToolbar->setBaseSize(numberOfColumns * 70, 20);
+	taskToolbar->setBaseSize(230, 20);
 
 	taskToolbar->addAction(deindentTaskAction);
 	taskToolbar->addAction(indentTaskAction);
@@ -323,8 +324,8 @@ void MainWindow::createTaskTab()
 	QWidget* taskLeftContent = new QWidget();
 	taskLeftContent->setLayout(taskLeftLayout);
 	taskLeftContent->setContentsMargins(0, 0, 0, 0);
-	taskLeftContent->setMinimumHeight(numberOfColumns * 70);
-	taskLeftContent->setMaximumWidth(numberOfColumns * 70);
+	taskLeftContent->setMinimumHeight(230);
+	taskLeftContent->setMaximumWidth(230);
 
 	// Create a layout (HBox) to contain table + scene:
 	QHBoxLayout* taskPageLayout = new QHBoxLayout();
@@ -578,6 +579,7 @@ void MainWindow::createResourceTab()
 	int numberOfColumns = 3;
 	resourceTable_ = new QTableWidget(0, 3);
 	resourceTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	resourceTable_->setColumnHidden(0, true);
 	connect(resourceTable_, SIGNAL(cellChanged(int, int)), this, SLOT(resourceValueChanged(int, int)));
 	QStringList labels;
 	labels.append("Id");
@@ -585,8 +587,8 @@ void MainWindow::createResourceTab()
 	labels.append("Role");
 	resourceTable_->setHorizontalHeaderLabels(labels);
 	resourceTable_->verticalHeader()->setVisible(false);
-	resourceTable_->setMinimumWidth(numberOfColumns * 70);
-	resourceTable_->setMaximumWidth(numberOfColumns * 70);
+	resourceTable_->setMinimumWidth(160);
+	resourceTable_->setMaximumWidth(160);
 	resourceTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	resourceTable_->setColumnWidth(0, 50);
@@ -605,7 +607,7 @@ void MainWindow::createResourceTab()
 	resourceToolbar->addAction(newResourceAction);
 	resourceToolbar->addAction(deleteResourceAction);
 	resourceToolbar->addSeparator();
-	resourceToolbar->setBaseSize(numberOfColumns * 70, 20);
+	resourceToolbar->setBaseSize(160, 20);
 	resourceToolbar->addAction(deindentResourceAction);
 	resourceToolbar->addAction(indentResourceAction);
 
@@ -619,8 +621,8 @@ void MainWindow::createResourceTab()
 	QWidget* resourceLeftContent = new QWidget();
 	resourceLeftContent->setLayout(resourceLeftLayout);
 	resourceLeftContent->setContentsMargins(0, 0, 0, 0);
-	resourceLeftContent->setMinimumHeight(numberOfColumns * 70);
-	resourceLeftContent->setMaximumWidth(numberOfColumns * 70);
+	resourceLeftContent->setMinimumHeight(160);
+	resourceLeftContent->setMaximumWidth(160);
 
 	// Create a layout (HBox) to contain table + scene:
 	QHBoxLayout* resourcePageLayout = new QHBoxLayout();
