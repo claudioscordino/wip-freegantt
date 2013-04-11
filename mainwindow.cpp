@@ -24,10 +24,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	taskTable_(0),
 	resourceTable_(0),
 	ui(new Ui::MainWindow),
-	tab(this),
+	mainTab_(this),
 	calendarTaskId_(0)
 {
 	ui->setupUi(this);
+	createActions();
 	createMainMenu();
 	createMainToolbar();
 	enableDisableMenu();
@@ -36,21 +37,116 @@ MainWindow::MainWindow(QWidget *parent) :
 	setWindowTitle("FreeGantt 0.3");
 	calendar_.setHidden(true);
 
-	connect(&tab, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
+	connect(&mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
 
 	// Tasks:
-	connect(newTaskAction, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
-	connect(deleteTaskAction, SIGNAL(triggered()), this, SLOT(removeTaskSlot()));
-	connect(indentTaskAction, SIGNAL(triggered()), this, SLOT(indentTaskSlot()));
-	connect(deindentTaskAction, SIGNAL(triggered()), this, SLOT(deindentTaskSlot()));
+	connect(newTaskAction_, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
+	connect(deleteTaskAction_, SIGNAL(triggered()), this, SLOT(removeTaskSlot()));
+	connect(indentTaskAction_, SIGNAL(triggered()), this, SLOT(indentTaskSlot()));
+	connect(deindentTaskAction_, SIGNAL(triggered()), this, SLOT(deindentTaskSlot()));
 
 	// Resources:
-	connect(newResourceAction, SIGNAL(triggered()), this, SLOT(newResourceSlot()));
-	connect(deleteResourceAction, SIGNAL(triggered()), this, SLOT(removeResourceSlot()));
-	connect(indentResourceAction, SIGNAL(triggered()), this, SLOT(indentResourceSlot()));
-	connect(deindentResourceAction, SIGNAL(triggered()), this, SLOT(deindentResourceSlot()));
+	connect(newResourceAction_, SIGNAL(triggered()), this, SLOT(newResourceSlot()));
+	connect(deleteResourceAction_, SIGNAL(triggered()), this, SLOT(removeResourceSlot()));
+	connect(indentResourceAction_, SIGNAL(triggered()), this, SLOT(indentResourceSlot()));
+	connect(deindentResourceAction_, SIGNAL(triggered()), this, SLOT(deindentResourceSlot()));
 }
 
+
+
+void MainWindow::createActions()
+{
+	// File menu:
+
+	newProjectAction_ = new QAction(tr("&New Project"), this);
+	newProjectAction_->setIcon(QIcon(":images/document-new.svg"));
+	newProjectAction_->setShortcut(QKeySequence::New);
+	newProjectAction_->setStatusTip(tr("Create a new project"));
+	connect(newProjectAction_, SIGNAL(triggered()), this, SLOT(newProjectSlot()));
+
+	openProjectAction_ = new QAction(tr("&Open Project"), this);
+	openProjectAction_->setIcon(QIcon(":images/document-open.svg"));
+	openProjectAction_->setShortcut(QKeySequence::Open);
+	openProjectAction_->setStatusTip(tr("Open a new project"));
+	connect(openProjectAction_, SIGNAL(triggered()), this, SLOT(openClicked()));
+
+	saveProjectAction_ = new QAction(tr("&Save Project"), this);
+	saveProjectAction_->setIcon(QIcon(":images/document-save.svg"));
+	saveProjectAction_->setShortcut(QKeySequence::Save);
+	saveProjectAction_->setStatusTip(tr("Save the current project"));
+
+	saveAsProjectAction_ = new QAction(tr("&Save Project as"), this);
+	saveAsProjectAction_->setIcon(QIcon(":images/document-save-as.svg"));
+	saveAsProjectAction_->setShortcut(QKeySequence::SaveAs);
+	saveAsProjectAction_->setStatusTip(tr("Save the current project with a new name"));
+
+	recentProjectsAction_ = new QAction(tr("&Open recent projects"), this);
+	recentProjectsAction_->setIcon(QIcon(":images/document-open-recent.png"));
+	recentProjectsAction_->setStatusTip(tr("Open a recent project"));
+
+	exportProjectAction_ = new QAction(tr("&Export to"), this);
+	exportProjectAction_->setIcon(QIcon(":images/document-save.svg"));
+	exportProjectAction_->setStatusTip(tr("Export the current project"));
+
+	optionsPanelAction_ = new QAction(tr("&Options"), this);
+	optionsPanelAction_->setIcon(QIcon(":images/preferences-desktop.svg"));
+	optionsPanelAction_->setStatusTip(tr("Set options"));
+
+	exitAction_ = new QAction(tr("&Exit"), this);
+	exitAction_->setIcon(QIcon(":images/exit.svg"));
+	exitAction_->setShortcut(QKeySequence::Close);
+	exitAction_->setStatusTip(tr("Exit"));
+	connect(exitAction_, SIGNAL(triggered()), this, SLOT(exitClicked()));
+
+
+	newTaskAction_ = new QAction(tr("&New Task"), this);
+	newTaskAction_->setIcon(QIcon(":images/add.png"));
+	newTaskAction_->setStatusTip(tr("Add a new task"));
+
+	deleteTaskAction_ = new QAction(tr("&Delete Task"), this);
+	deleteTaskAction_->setIcon(QIcon(":images/list-remove.svg"));
+	deleteTaskAction_->setStatusTip(tr("Delete the selected task"));
+
+	indentTaskAction_ = new QAction(tr("&Indent Task"), this);
+	indentTaskAction_->setIcon(QIcon(":images/go-next.png"));
+	indentTaskAction_->setStatusTip(tr("Indent the selected task"));
+
+	deindentTaskAction_ = new QAction(tr("&Deindent Task"), this);
+	deindentTaskAction_->setIcon(QIcon(":images/go-previous.png"));
+	deindentTaskAction_->setStatusTip(tr("Deindent the selected task"));
+
+	newResourceAction_ = new QAction(tr("&New Resource"), this);
+	newResourceAction_->setIcon(QIcon(":images/im-user.png"));
+	newResourceAction_->setStatusTip(tr("Add a new resource/group"));
+
+	deleteResourceAction_ = new QAction(tr("&Delete resource "), this);
+	deleteResourceAction_->setIcon(QIcon(":images/im-kick-user.png"));
+	deleteResourceAction_->setStatusTip(tr("Delete the selected resource/group"));
+
+	indentResourceAction_ = new QAction(tr("&Group Resource"), this);
+	indentResourceAction_->setIcon(QIcon(":images/go-next.png"));
+	indentResourceAction_->setStatusTip(tr("Group resources"));
+
+	deindentResourceAction_= new QAction(tr("&Ungropu Resource"), this);
+	deindentResourceAction_->setIcon(QIcon(":images/go-previous.png"));
+	deindentResourceAction_->setStatusTip(tr("Ungroup resources"));
+
+	viewResourceAction_ = new QAction(tr("&View Resources"), this);
+	viewResourceAction_->setIcon(QIcon(":images/im-user-offline.png"));
+	viewResourceAction_->setStatusTip(tr("View current resources"));
+	connect(viewResourceAction_, SIGNAL(triggered()), this, SLOT(switchToResourceTab()));
+
+	viewTaskAction_ = new QAction(tr("&View Tasks"), this);
+	viewTaskAction_->setIcon(QIcon(":images/showGrid.png"));
+	viewTaskAction_->setStatusTip(tr("View current tasks"));
+	connect(viewTaskAction_, SIGNAL(triggered()), this, SLOT(switchToTaskTab()));
+
+	aboutAction_ = new QAction(tr("&About"), this);
+	aboutAction_->setIcon(QIcon(":images/statusWindow.png"));
+	aboutAction_->setStatusTip(tr("About FreeGantt"));
+	connect(aboutAction_, SIGNAL(triggered()), this, SLOT(aboutClicked()));
+
+}
 
 
 // 0 = Resources; 1 = Tasks
@@ -66,107 +162,40 @@ void MainWindow::switchTab(int tab_nb)
 void MainWindow::createMainMenu()
 {
 	// File menu:
-
-	newProjectAction = new QAction(tr("&New Project"), this);
-	newProjectAction->setIcon(QIcon(":images/document-new.svg"));
-	newProjectAction->setStatusTip(tr("Create a new project"));
-	connect(newProjectAction, SIGNAL(triggered()), this, SLOT(newProjectSlot()));
-
-	openProjectAction = new QAction(tr("&Open Project"), this);
-	openProjectAction->setIcon(QIcon(":images/document-open.svg"));
-	connect(openProjectAction, SIGNAL(triggered()), this, SLOT(openClicked()));
-
-	saveProjectAction = new QAction(tr("&Save Project"), this);
-	saveProjectAction->setIcon(QIcon(":images/document-save.svg"));
-
-	saveAsProjectAction = new QAction(tr("&Save Project as"), this);
-	saveAsProjectAction->setIcon(QIcon(":images/document-save-as.svg"));
-
-	recentProjectsAction = new QAction(tr("&Open recent projects"), this);
-	recentProjectsAction->setIcon(QIcon(":images/document-open-recent.png"));
-
-	exportAction = new QAction(tr("&Export to"), this);
-	exportAction->setIcon(QIcon(":images/document-save.svg"));
-
-	optionsAction= new QAction(tr("&Options"), this);
-	optionsAction->setIcon(QIcon(":images/preferences-desktop.svg"));
-
-	exitAction = new QAction(tr("&Exit"), this);
-	exitAction->setIcon(QIcon(":images/exit.svg"));
-	connect(exitAction, SIGNAL(triggered()), this, SLOT(exitClicked()));
-
-	fileMenu = menuBar()->addMenu((tr("&File")));
-	fileMenu->addAction(newProjectAction);
-	fileMenu->addAction(openProjectAction);
-	fileMenu->addAction(recentProjectsAction);
-	fileMenu->addAction(saveProjectAction);
-	fileMenu->addAction(saveAsProjectAction);
-	fileMenu->addAction(exportAction);
-	fileMenu->addSeparator();
-	fileMenu->addAction(optionsAction);
-	fileMenu->addSeparator();
-	fileMenu->addAction(exitAction);
+	fileMenu_ = menuBar()->addMenu((tr("&File")));
+	fileMenu_->addAction(newProjectAction_);
+	fileMenu_->addAction(openProjectAction_);
+	fileMenu_->addAction(recentProjectsAction_);
+	fileMenu_->addAction(saveProjectAction_);
+	fileMenu_->addAction(saveAsProjectAction_);
+	fileMenu_->addAction(exportProjectAction_);
+	fileMenu_->addSeparator();
+	fileMenu_->addAction(optionsPanelAction_);
+	fileMenu_->addSeparator();
+	fileMenu_->addAction(exitAction_);
 
 	// Edit menu:
-
-	editMenu = menuBar()->addMenu((tr("&Edit")));
-
-	newTaskAction = new QAction(tr("&New Task"), this);
-	newTaskAction->setIcon(QIcon(":images/add.png"));
-	editMenu->addAction(newTaskAction);
-
-	deleteTaskAction = new QAction(tr("&Delete Task"), this);
-	deleteTaskAction->setIcon(QIcon(":images/list-remove.svg"));
-	editMenu->addAction(deleteTaskAction);
-
-	indentTaskAction= new QAction(tr("&Indent Task"), this);
-	indentTaskAction->setIcon(QIcon(":images/go-next.png"));
-	editMenu->addAction(indentTaskAction);
-
-	deindentTaskAction= new QAction(tr("&Deindent Task"), this);
-	deindentTaskAction->setIcon(QIcon(":images/go-previous.png"));
-	editMenu->addAction(deindentTaskAction);
-
-
-	editMenu->addSeparator();
-
-	newResourceAction = new QAction(tr("&New Resource"), this);
-	newResourceAction->setIcon(QIcon(":images/im-user.png"));
-	editMenu->addAction(newResourceAction);
-
-	deleteResourceAction = new QAction(tr("&Delete resource "), this);
-	deleteResourceAction->setIcon(QIcon(":images/im-kick-user.png"));
-	editMenu->addAction(deleteResourceAction);
-
-	indentResourceAction= new QAction(tr("&Group Resource"), this);
-	indentResourceAction->setIcon(QIcon(":images/go-next.png"));
-	editMenu->addAction(indentResourceAction);
-
-	deindentResourceAction= new QAction(tr("&Ungropu Resource"), this);
-	deindentResourceAction->setIcon(QIcon(":images/go-previous.png"));
-	editMenu->addAction(deindentResourceAction);
+	editMenu_ = menuBar()->addMenu((tr("&Edit")));
+	editMenu_->addAction(newTaskAction_);
+	editMenu_->addAction(deleteTaskAction_);
+	editMenu_->addAction(indentTaskAction_);
+	editMenu_->addAction(deindentTaskAction_);
+	editMenu_->addSeparator();
+	editMenu_->addAction(newResourceAction_);
+	editMenu_->addAction(deleteResourceAction_);
+	editMenu_->addAction(indentResourceAction_);
+	editMenu_->addAction(deindentResourceAction_);
 
 
 	// View menu:
 
-	viewMenu = menuBar()->addMenu((tr("&View")));
-	viewResourceAction = new QAction(tr("&View Resources"), this);
-	viewResourceAction->setIcon(QIcon(":images/im-user-offline.png"));
-	viewMenu->addAction(viewResourceAction);
-	connect(viewResourceAction, SIGNAL(triggered()), this, SLOT(switchToResourceTab()));
-
-	viewTaskAction = new QAction(tr("&View Tasks"), this);
-	viewTaskAction->setIcon(QIcon(":images/showGrid.png"));
-	viewMenu->addAction(viewTaskAction);
-	connect(viewTaskAction, SIGNAL(triggered()), this, SLOT(switchToTaskTab()));
-
+	viewMenu_ = menuBar()->addMenu((tr("&View")));
+	viewMenu_->addAction(viewResourceAction_);
+	viewMenu_->addAction(viewTaskAction_);
 	menuBar()->addSeparator();
 
-	aboutMenu = menuBar()->addMenu((tr("&About")));
-	aboutAction = new QAction(tr("&About"), this);
-	aboutAction->setIcon(QIcon(":images/statusWindow.png"));
-	connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
-	aboutMenu->addAction(aboutAction);
+	aboutMenu_ = menuBar()->addMenu((tr("&About")));
+	aboutMenu_->addAction(aboutAction_);
 }
 
 
@@ -174,17 +203,17 @@ void MainWindow::createMainMenu()
 void MainWindow::enableDisableMenu()
 {
 	if (project_ != 0) {
-		editMenu->setEnabled(true);
-		viewMenu->setEnabled(true);
-		saveProjectAction->setEnabled(true);
-		saveAsProjectAction->setEnabled(true);
-		exportAction->setEnabled(true);
+		editMenu_->setEnabled(true);
+		viewMenu_->setEnabled(true);
+		saveProjectAction_->setEnabled(true);
+		saveAsProjectAction_->setEnabled(true);
+		exportProjectAction_->setEnabled(true);
 	} else {
-		editMenu->setEnabled(false);
-		viewMenu->setEnabled(false);
-		saveProjectAction->setEnabled(false);
-		saveAsProjectAction->setEnabled(false);
-		exportAction->setEnabled(false);
+		editMenu_->setEnabled(false);
+		viewMenu_->setEnabled(false);
+		saveProjectAction_->setEnabled(false);
+		saveAsProjectAction_->setEnabled(false);
+		exportProjectAction_->setEnabled(false);
 	}
 }
 
@@ -203,10 +232,10 @@ void MainWindow::openClicked()
 
 void MainWindow::createMainToolbar()
 {
-	mainToolbar = addToolBar(tr("&Main commands"));
-	mainToolbar->addAction(newProjectAction);
-	mainToolbar->addAction(openProjectAction);
-	mainToolbar->addAction(saveProjectAction);
+	mainToolbar_ = addToolBar(tr("&Main commands"));
+	mainToolbar_->addAction(newProjectAction_);
+	mainToolbar_->addAction(openProjectAction_);
+	mainToolbar_->addAction(saveProjectAction_);
 
 }
 
@@ -305,14 +334,14 @@ void MainWindow::createTaskTab()
 	QToolBar* taskToolbar = addToolBar(tr("&Task toolbar"));
 
 
-	taskToolbar->addAction(newTaskAction);
-	taskToolbar->addAction(deleteTaskAction);
+	taskToolbar->addAction(newTaskAction_);
+	taskToolbar->addAction(deleteTaskAction_);
 	taskToolbar->addSeparator();
 
 	taskToolbar->setBaseSize(230, 20);
 
-	taskToolbar->addAction(deindentTaskAction);
-	taskToolbar->addAction(indentTaskAction);
+	taskToolbar->addAction(deindentTaskAction_);
+	taskToolbar->addAction(indentTaskAction_);
 
 	QVBoxLayout* taskLeftLayout = new QVBoxLayout();
 	taskLeftLayout->addWidget(taskToolbar);
@@ -341,24 +370,24 @@ void MainWindow::createTaskTab()
 	taskPage->setContentsMargins(0, 0, 0, 0);
 
 	// Add the widget to the tab:
-	tab.addTab(taskPage, tr("Tasks"));
-	setCentralWidget(&tab);
+	mainTab_.addTab(taskPage, tr("Tasks"));
+	setCentralWidget(&mainTab_);
 }
 
 
 void MainWindow::switchToTaskTab()
 {
-	tab.setCurrentIndex(1);
-	newTaskAction->setEnabled(true);
-	deleteTaskAction->setEnabled(true);
-	indentTaskAction->setEnabled(true);
-	deindentTaskAction->setEnabled(true);
-	newResourceAction->setEnabled(false);
-	deleteResourceAction->setEnabled(false);
-	viewResourceAction->setEnabled(true);
-	viewTaskAction->setEnabled(false);
-	indentResourceAction->setEnabled(false);
-	deindentResourceAction->setEnabled(false);
+	mainTab_.setCurrentIndex(1);
+	newTaskAction_->setEnabled(true);
+	deleteTaskAction_->setEnabled(true);
+	indentTaskAction_->setEnabled(true);
+	deindentTaskAction_->setEnabled(true);
+	newResourceAction_->setEnabled(false);
+	deleteResourceAction_->setEnabled(false);
+	viewResourceAction_->setEnabled(true);
+	viewTaskAction_->setEnabled(false);
+	indentResourceAction_->setEnabled(false);
+	deindentResourceAction_->setEnabled(false);
 }
 
 void MainWindow::refreshTaskTable()
@@ -603,12 +632,12 @@ void MainWindow::createResourceTab()
 	resourceView->show();
 
 	QToolBar* resourceToolbar = addToolBar(tr("&Resource toolbar"));
-	resourceToolbar->addAction(newResourceAction);
-	resourceToolbar->addAction(deleteResourceAction);
+	resourceToolbar->addAction(newResourceAction_);
+	resourceToolbar->addAction(deleteResourceAction_);
 	resourceToolbar->addSeparator();
 	resourceToolbar->setBaseSize(160, 20);
-	resourceToolbar->addAction(deindentResourceAction);
-	resourceToolbar->addAction(indentResourceAction);
+	resourceToolbar->addAction(deindentResourceAction_);
+	resourceToolbar->addAction(indentResourceAction_);
 
 
 	QVBoxLayout* resourceLeftLayout = new QVBoxLayout();
@@ -638,24 +667,24 @@ void MainWindow::createResourceTab()
 	resourcePage->setContentsMargins(0, 0, 0, 0);
 
 	// Add the widget to the tab:
-	tab.addTab(resourcePage, tr("Resources"));
-	setCentralWidget(&tab);
+	mainTab_.addTab(resourcePage, tr("Resources"));
+	setCentralWidget(&mainTab_);
 }
 
 
 void MainWindow::switchToResourceTab()
 {
-	tab.setCurrentIndex(0);
-	newTaskAction->setEnabled(false);
-	deleteTaskAction->setEnabled(false);
-	indentTaskAction->setEnabled(false);
-	deindentTaskAction->setEnabled(false);
-	newResourceAction->setEnabled(true);
-	deleteResourceAction->setEnabled(true);
-	viewResourceAction->setEnabled(false);
-	viewTaskAction->setEnabled(true);
-	indentResourceAction->setEnabled(true);
-	deindentResourceAction->setEnabled(true);
+	mainTab_.setCurrentIndex(0);
+	newTaskAction_->setEnabled(false);
+	deleteTaskAction_->setEnabled(false);
+	indentTaskAction_->setEnabled(false);
+	deindentTaskAction_->setEnabled(false);
+	newResourceAction_->setEnabled(true);
+	deleteResourceAction_->setEnabled(true);
+	viewResourceAction_->setEnabled(false);
+	viewTaskAction_->setEnabled(true);
+	indentResourceAction_->setEnabled(true);
+	deindentResourceAction_->setEnabled(true);
 
 }
 

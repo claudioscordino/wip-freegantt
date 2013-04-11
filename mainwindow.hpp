@@ -58,49 +58,7 @@ private slots:
 	void changeTaskBegin();
 
 private:
-	Project* project_;
-	QTableWidget* taskTable_;
-	QTableWidget* resourceTable_;
-
-	Ui::MainWindow *ui;
-
-	// File menu:
-	QMenu* fileMenu;
-	QAction* newProjectAction;
-	QAction* openProjectAction;
-	QAction* recentProjectsAction;
-	QAction* saveProjectAction;
-	QAction* saveAsProjectAction;
-	QAction* exportAction;
-	QAction* exitAction;
-	QAction* optionsAction;
-
-	// Edit menu:
-	QMenu* editMenu;
-	QAction* newResourceAction;
-	QAction* deleteResourceAction;
-	QAction* newTaskAction;
-	QAction* deleteTaskAction;
-
-	// View menu:
-	QMenu* viewMenu;
-	QAction* viewResourceAction;
-	QAction* viewTaskAction;
-
-	// About menu:
-	QMenu* aboutMenu;
-	QAction* aboutAction;
-
-	// Main toolbar
-	QAction* indentTaskAction;
-	QAction* deindentTaskAction;
-	QAction* indentResourceAction;
-	QAction* deindentResourceAction;
-
-	QToolBar* mainToolbar;
-
-	QTabWidget tab;
-
+	void createActions();
 	void createMainMenu();
 	void createMainToolbar();
 	void enableDisableMenu();
@@ -110,6 +68,50 @@ private:
 
 	void createResourceTab();
 	void createTaskTab();
+
+	Project* project_;
+	QTableWidget* taskTable_;
+	QTableWidget* resourceTable_;
+
+	Ui::MainWindow *ui;
+
+	// File menu:
+	QMenu* fileMenu_;
+	QAction* newProjectAction_;
+	QAction* openProjectAction_;
+	QAction* recentProjectsAction_;
+	QAction* saveProjectAction_;
+	QAction* saveAsProjectAction_;
+	QAction* exportProjectAction_;
+	QAction* exitAction_;
+	QAction* optionsPanelAction_;
+
+	// Edit menu:
+	QMenu* editMenu_;
+	QAction* newResourceAction_;
+	QAction* deleteResourceAction_;
+	QAction* newTaskAction_;
+	QAction* deleteTaskAction_;
+
+	// View menu:
+	QMenu* viewMenu_;
+	QAction* viewResourceAction_;
+	QAction* viewTaskAction_;
+
+	// About menu:
+	QMenu* aboutMenu_;
+	QAction* aboutAction_;
+
+	// Main toolbar
+	QAction* indentTaskAction_;
+	QAction* deindentTaskAction_;
+	QAction* indentResourceAction_;
+	QAction* deindentResourceAction_;
+
+	QToolBar* mainToolbar_;
+
+	QTabWidget mainTab_;
+
 
 	QCalendarWidget calendar_;
 	int calendarTaskId_;
