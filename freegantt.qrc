@@ -66,5 +66,6 @@
         <file>images/view-refresh.png</file>
         <file>images/view-refresh.svg</file>
         <file>images/zoom.png</file>
+        <file>images/printer.png</file>
     </qresource>
 </RCC>

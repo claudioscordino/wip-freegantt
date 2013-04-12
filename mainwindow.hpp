@@ -78,6 +78,7 @@ private:
 	// File menu:
 	QMenu* fileMenu_;
 	QAction* newProjectAction_;
+	QAction* printProjectAction_;
 	QAction* openProjectAction_;
 	QAction* recentProjectsAction_;
 	QAction* saveProjectAction_;

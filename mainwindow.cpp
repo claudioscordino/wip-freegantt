@@ -84,11 +84,17 @@ void MainWindow::createActions()
 	recentProjectsAction_->setIcon(QIcon(":images/document-open-recent.png"));
 	recentProjectsAction_->setStatusTip(tr("Open a recent project"));
 
-	exportProjectAction_ = new QAction(tr("&Export to"), this);
+	exportProjectAction_ = new QAction(tr("&Export project"), this);
 	exportProjectAction_->setIcon(QIcon(":images/document-save.svg"));
 	exportProjectAction_->setStatusTip(tr("Export the current project"));
 
+	printProjectAction_ = new QAction(tr("&Print project"), this);
+	printProjectAction_->setIcon(QIcon(":images/printer.png"));
+	printProjectAction_->setShortcut(QKeySequence::Print);
+	printProjectAction_->setStatusTip(tr("Print the current project"));
+
 	optionsPanelAction_ = new QAction(tr("&Options"), this);
+	optionsPanelAction_->setShortcut(QKeySequence::Close);
 	optionsPanelAction_->setIcon(QIcon(":images/preferences-desktop.svg"));
 	optionsPanelAction_->setStatusTip(tr("Set options"));
 
@@ -97,7 +103,6 @@ void MainWindow::createActions()
 	exitAction_->setShortcut(QKeySequence::Close);
 	exitAction_->setStatusTip(tr("Exit"));
 	connect(exitAction_, SIGNAL(triggered()), this, SLOT(exitClicked()));
-
 
 	newTaskAction_ = new QAction(tr("&New Task"), this);
 	newTaskAction_->setIcon(QIcon(":images/add.png"));
@@ -145,7 +150,6 @@ void MainWindow::createActions()
 	aboutAction_->setIcon(QIcon(":images/statusWindow.png"));
 	aboutAction_->setStatusTip(tr("About FreeGantt"));
 	connect(aboutAction_, SIGNAL(triggered()), this, SLOT(aboutClicked()));
-
 }
 
 
@@ -169,6 +173,7 @@ void MainWindow::createMainMenu()
 	fileMenu_->addAction(saveProjectAction_);
 	fileMenu_->addAction(saveAsProjectAction_);
 	fileMenu_->addAction(exportProjectAction_);
+	fileMenu_->addAction(printProjectAction_);
 	fileMenu_->addSeparator();
 	fileMenu_->addAction(optionsPanelAction_);
 	fileMenu_->addSeparator();
@@ -188,7 +193,6 @@ void MainWindow::createMainMenu()
 
 
 	// View menu:
-
 	viewMenu_ = menuBar()->addMenu((tr("&View")));
 	viewMenu_->addAction(viewResourceAction_);
 	viewMenu_->addAction(viewTaskAction_);
