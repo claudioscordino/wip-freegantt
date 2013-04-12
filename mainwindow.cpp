@@ -561,7 +561,8 @@ void MainWindow::taskValueChanged(int row, int column)
 		break;
 	case 3:
 		std::cout << "Duration changed!" << std::endl;
-		project_->getTaskFromId(id)->setDuration(taskTable_->item(row, column)->text().toInt());
+		if (taskTable_->item(row, column)->text().toInt() >= 0)
+			project_->getTaskFromId(id)->setDuration(taskTable_->item(row, column)->text().toInt());
 		break;
 	}
 	refreshTaskTable();
