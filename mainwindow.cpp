@@ -25,8 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	resourceTable_(0),
 	ui(new Ui::MainWindow),
 	mainTab_(this),
-	calendarTaskId_(0),
-	currentTab_(0)
+	calendarTaskId_(0)
 {
 	ui->setupUi(this);
 	createActions();
@@ -58,7 +57,6 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::createActions()
 {
 	// File menu:
-
 	newProjectAction_ = new QAction(tr("&New Project"), this);
 	newProjectAction_->setIcon(QIcon(":images/document-new.svg"));
 	newProjectAction_->setShortcut(QKeySequence::New);
@@ -163,20 +161,18 @@ void MainWindow::createActions()
 }
 
 
-// 0 = Resources; 1 = Tasks
+// 0 = Tasks; 1 = Resources
 void MainWindow::switchToTab(int tab_nb)
 {
-	if (tab_nb == 0)
-		switchToResourceTab();
-	else
+	if (tab_nb == 0)		
 		switchToTaskTab();
-	currentTab_ = tab_nb;
+	else
+		switchToResourceTab();
 }
 
-// 0 = Resources; 1 = Tasks
 void MainWindow::switchTab()
 {
-	if (currentTab_ == 0)
+	if (mainTab_.currentIndex() == 0)
 		switchToTab(1);
 	else
 		switchToTab(0);
@@ -211,13 +207,13 @@ void MainWindow::createMainMenu()
 	editMenu_->addAction(indentResourceAction_);
 	editMenu_->addAction(deindentResourceAction_);
 
-
 	// View menu:
 	viewMenu_ = menuBar()->addMenu((tr("&View")));
 	viewMenu_->addAction(viewResourceAction_);
 	viewMenu_->addAction(viewTaskAction_);
 	menuBar()->addSeparator();
 
+	// About menu:
 	aboutMenu_ = menuBar()->addMenu((tr("&About")));
 	aboutMenu_->addAction(aboutAction_);
 	aboutMenu_->addAction(aboutQtAction_);
@@ -272,8 +268,8 @@ void MainWindow::newProjectSlot()
 	if (project_ == 0) {
 		project_ = new Project();
 		enableDisableMenu();
-		createResourceTab();
 		createTaskTab();
+		createResourceTab();
 	}
 	switchToTaskTab();
 }
@@ -403,7 +399,7 @@ void MainWindow::createTaskTab()
 
 void MainWindow::switchToTaskTab()
 {
-	mainTab_.setCurrentIndex(1);
+	mainTab_.setCurrentIndex(0);
 	newTaskAction_->setEnabled(true);
 	deleteTaskAction_->setEnabled(true);
 	indentTaskAction_->setEnabled(true);
@@ -701,7 +697,7 @@ void MainWindow::createResourceTab()
 
 void MainWindow::switchToResourceTab()
 {
-	mainTab_.setCurrentIndex(0);
+	mainTab_.setCurrentIndex(1);
 	newTaskAction_->setEnabled(false);
 	deleteTaskAction_->setEnabled(false);
 	indentTaskAction_->setEnabled(false);

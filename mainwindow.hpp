@@ -67,8 +67,9 @@ private:
 		return project_->loadFile(filename);
 	}
 
-	void createResourceTab();
 	void createTaskTab();
+	void createResourceTab();
+
 
 	Project* project_;
 	QTableWidget* taskTable_;
@@ -119,7 +120,6 @@ private:
 	QCalendarWidget calendar_;
 	int calendarTaskId_;
 
-	int currentTab_;
 };
 
 #endif // MAINWINDOW_HPP
