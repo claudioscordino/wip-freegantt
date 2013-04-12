@@ -41,7 +41,8 @@ private slots:
 	bool saveClicked(){return true;}
 	void openClicked();
 	void aboutClicked();
-	void switchTab(int tab);
+	void switchToTab(int tab);
+	void switchTab();
 	void switchToTaskTab();
 	void switchToResourceTab();
 	void newTaskSlot();
@@ -86,6 +87,7 @@ private:
 	QAction* exportProjectAction_;
 	QAction* exitAction_;
 	QAction* optionsPanelAction_;
+	QAction* switchTabAction_;
 
 	// Edit menu:
 	QMenu* editMenu_;
@@ -113,9 +115,10 @@ private:
 
 	QTabWidget mainTab_;
 
-
 	QCalendarWidget calendar_;
 	int calendarTaskId_;
+
+	int currentTab_;
 };
 
 #endif // MAINWINDOW_HPP

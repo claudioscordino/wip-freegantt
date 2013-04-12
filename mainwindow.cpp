@@ -25,7 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	resourceTable_(0),
 	ui(new Ui::MainWindow),
 	mainTab_(this),
-	calendarTaskId_(0)
+	calendarTaskId_(0),
+	currentTab_(0)
 {
 	ui->setupUi(this);
 	createActions();
@@ -37,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	setWindowTitle("FreeGantt 0.3");
 	calendar_.setHidden(true);
 
-	connect(&mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
+	connect(&mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchToTab(int)));
 
 	// Tasks:
 	connect(newTaskAction_, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
@@ -150,16 +151,30 @@ void MainWindow::createActions()
 	aboutAction_->setIcon(QIcon(":images/statusWindow.png"));
 	aboutAction_->setStatusTip(tr("About FreeGantt"));
 	connect(aboutAction_, SIGNAL(triggered()), this, SLOT(aboutClicked()));
+
+	switchTabAction_ = new QAction(tr("&Switch Tab"), this);
+	switchTabAction_->setShortcut(tr("Ctrl+Tab"));
+	connect(switchTabAction_, SIGNAL(triggered()), this, SLOT(switchTab()));
 }
 
 
 // 0 = Resources; 1 = Tasks
-void MainWindow::switchTab(int tab_nb)
+void MainWindow::switchToTab(int tab_nb)
 {
 	if (tab_nb == 0)
 		switchToResourceTab();
 	else
 		switchToTaskTab();
+	currentTab_ = tab_nb;
+}
+
+// 0 = Resources; 1 = Tasks
+void MainWindow::switchTab()
+{
+	if (currentTab_ == 0)
+		switchToTab(1);
+	else
+		switchToTab(0);
 }
 
 
