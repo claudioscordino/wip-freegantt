@@ -104,6 +104,7 @@ private:
 	// About menu:
 	QMenu* aboutMenu_;
 	QAction* aboutAction_;
+	QAction* aboutQtAction_;
 
 	// Main toolbar
 	QAction* indentTaskAction_;

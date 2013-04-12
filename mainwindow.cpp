@@ -152,6 +152,11 @@ void MainWindow::createActions()
 	aboutAction_->setStatusTip(tr("About FreeGantt"));
 	connect(aboutAction_, SIGNAL(triggered()), this, SLOT(aboutClicked()));
 
+	aboutQtAction_ = new QAction(tr("About &Qt"), this);
+	aboutQtAction_->setStatusTip(tr("Show information about Qt"));
+	aboutQtAction_->setIcon(QIcon(":images/qt_icon80.png"));
+	connect(aboutQtAction_, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+
 	switchTabAction_ = new QAction(tr("&Switch Tab"), this);
 	switchTabAction_->setShortcut(tr("Ctrl+Tab"));
 	connect(switchTabAction_, SIGNAL(triggered()), this, SLOT(switchTab()));
@@ -215,6 +220,8 @@ void MainWindow::createMainMenu()
 
 	aboutMenu_ = menuBar()->addMenu((tr("&About")));
 	aboutMenu_->addAction(aboutAction_);
+	aboutMenu_->addAction(aboutQtAction_);
+
 }
 
 

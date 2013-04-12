@@ -67,5 +67,6 @@
         <file>images/view-refresh.svg</file>
         <file>images/zoom.png</file>
         <file>images/printer.png</file>
+        <file>images/qt_icon80.png</file>
     </qresource>
 </RCC>
