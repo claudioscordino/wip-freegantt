@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(deleteResourceAction_, SIGNAL(triggered()), this, SLOT(removeResourceSlot()));
 	connect(indentResourceAction_, SIGNAL(triggered()), this, SLOT(indentResourceSlot()));
 	connect(deindentResourceAction_, SIGNAL(triggered()), this, SLOT(deindentResourceSlot()));
+
+	setWindowModified(false);
 }
 
 
@@ -74,11 +76,14 @@ void MainWindow::createActions()
 	saveProjectAction_->setIcon(QIcon(":images/document-save.svg"));
 	saveProjectAction_->setShortcut(QKeySequence::Save);
 	saveProjectAction_->setStatusTip(tr("Save the current project"));
+	connect(saveProjectAction_, SIGNAL(triggered()), this, SLOT(saveProject()));
 
 	saveAsProjectAction_ = new QAction(tr("&Save Project as"), this);
 	saveAsProjectAction_->setIcon(QIcon(":images/document-save-as.svg"));
 	saveAsProjectAction_->setShortcut(QKeySequence::SaveAs);
 	saveAsProjectAction_->setStatusTip(tr("Save the current project with a new name"));
+	connect(saveAsProjectAction_, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
+
 
 	recentProjectsAction_ = new QAction(tr("&Open recent projects"), this);
 	recentProjectsAction_->setIcon(QIcon(":images/document-open-recent.png"));
@@ -255,13 +260,38 @@ void MainWindow::openProject()
 	if (okToDiscardCurrentProject() > 0) {
 		QString fileName = QFileDialog::getOpenFileName(this,
 								tr("Open saved projects"), ".",
-								tr("FreeGantt files (*.ftt)"));
-		if (!fileName.isEmpty())
+								tr("FreeGantt files (*.fgt)"));
+		if (!fileName.isEmpty()){
 			loadFile(fileName.toStdString());
+			setWindowModified(false);
+		}
 	}
 
 }
 
+bool MainWindow::saveProject()
+{
+	if (project_ != 0){
+		if (project_->getFileName() == "")
+			return saveProjectAs();
+	} else {
+		return project_->save();
+	}
+}
+
+bool MainWindow::saveProjectAs()
+{
+	if (project_ != 0){
+		QString file_name = QFileDialog::getSaveFileName(this,
+								 tr ("Save project as"), ".",
+								 tr ("FreeGantt files (*.fgt)"));
+		if (file_name.isEmpty())
+			return false;
+		project_->setFileName(file_name.toStdString());
+		return project_->save();
+	}
+	return false;
+}
 
 void MainWindow::newProject()
 {
@@ -270,15 +300,18 @@ void MainWindow::newProject()
 		delete mainTab_;
 		delete project_;
 	case 2:
-		project_ = new Project("Unnamed");
+		project_ = new Project("Untitled");
 		mainTab_ = new QTabWidget(this);
 		connect(mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchToTab(int)));
 
 		enableDisableMenu();
 		createTaskTab();
 		createResourceTab();
-		setWindowTitle("FreeGantt " VERSION " --- Unnamed");
+		//QString project_name ("FreeGantt " + QString(VERSION) + " - " + QString(project_->getName().c_str()) + " [*]");
+		setWindowTitle("FreeGantt " + QString(VERSION) + " - " + QString(project_->getName().c_str()) + " [*]");
+		//setWindowTitle(project_name);
 		statusBar()->showMessage(tr("Project created."), 2000);
+		setWindowModified(false);
 	}
 	switchToTaskTab();
 }
@@ -514,6 +547,7 @@ void MainWindow::refreshTaskTable()
 void MainWindow::newTaskSlot()
 {
 	project_->addTask(new Task("New task"));
+	setWindowModified(true);
 	refreshTaskTable();
 }
 
@@ -524,6 +558,7 @@ void MainWindow::removeTaskSlot()
 		return;
 	int id = taskTable_->item(row, 0)->text().toInt();
 	project_->removeTask(id);
+	setWindowModified(true);
 	refreshTaskTable();
 }
 
@@ -555,6 +590,7 @@ void MainWindow::indentTaskSlot()
 	std::cerr << "Parent id: " << parent << std::endl;
 
 	project_->addChildTask(parent, project_->getTaskFromId(child));
+	setWindowModified(true);
 	refreshTaskTable();
 }
 
@@ -570,6 +606,7 @@ void MainWindow::deindentTaskSlot()
 	std::cout << "Deindenting task " << child << std::endl;
 
 	project_->removeChildTask(project_->getTaskFromId(child));
+	setWindowModified(true);
 	refreshTaskTable();
 }
 
@@ -594,6 +631,7 @@ void MainWindow::taskValueChanged(int row, int column)
 			project_->getTaskFromId(id)->setDuration(taskTable_->item(row, column)->text().toInt());
 		break;
 	}
+	setWindowModified(true);
 	refreshTaskTable();
 }
 
@@ -606,6 +644,7 @@ void MainWindow::changeTaskBegin()
 		std::cerr << "-2-" << std::endl;
 		calendar_.setHidden(true);
 		std::cerr << "New date: " << project_->getTaskFromId(calendarTaskId_)->getBegin().toString("dd.MM.yyyy").toStdString() << std::endl;
+		setWindowModified(true);
 		refreshTaskTable();
 	}
 }
@@ -812,6 +851,7 @@ void MainWindow::removeResourceSlot()
 	int id = resourceTable_->item(row, 0)->text().toInt();
 	std::cerr << "Row: " << row << " Id: " << id << std::endl;
 	project_->removeResource(id);
+	setWindowModified(true);
 	refreshResourceTable();
 }
 
@@ -844,6 +884,7 @@ void MainWindow::indentResourceSlot()
 	std::cerr << "Parent id: " << parent << std::endl;
 
 	project_->addChildResource(parent, project_->getResourceFromId(child));
+	setWindowModified(true);
 	refreshResourceTable();
 }
 
@@ -860,6 +901,7 @@ void MainWindow::deindentResourceSlot()
 	std::cout << "Deindenting resource " << child << std::endl;
 
 	project_->removeChildResource(project_->getResourceFromId(child));
+	setWindowModified(true);
 	refreshResourceTable();
 }
 
@@ -880,6 +922,7 @@ void MainWindow::resourceValueChanged(int row, int column)
 		std::cout << "Role changed!" << std::endl;
 		project_->getResourceFromId(id)->setRole(resourceTable_->item(row, column)->text().toStdString());
 	}
+	setWindowModified(true);
 	refreshResourceTable();
 }
 

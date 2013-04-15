@@ -179,24 +179,28 @@ public:
 
 	//Files:
 
-	inline bool loadProject(const std::string& file){
+	inline bool load(const std::string& file){
 		file_name_ = file;
 		project_name_ = file;
 		// TODO: load file
 		return true;
 	}
 
-	inline bool saveProject(const std::string& file){
-		// TODO: save file
+	inline bool save(){
+		// TODO: save to file
 		return true;
 	}
 
-	inline std::string getProjectName() {
+	inline std::string getName() {
 		return project_name_;
 	}
 
 	inline std::string getFileName() {
 		return file_name_;
+	}
+
+	inline void setFileName(const std::string& file) {
+		file_name_ = file;
 	}
 
 

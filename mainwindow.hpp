@@ -38,7 +38,8 @@ private slots:
 	int okToDiscardCurrentProject();
 	void exitProgram();
 	void newProject();
-	bool saveProject(){return true;}
+	bool saveProject();
+	bool saveProjectAs();
 	void openProject();
 	void aboutProgram();
 	void switchToTab(int tab);
@@ -64,7 +65,7 @@ private:
 	void createMainToolbar();
 	void enableDisableMenu();
 	bool loadFile(const std::string& filename){
-		return project_->loadProject(filename);
+		return project_->load(filename);
 	}
 
 	void createTaskTab();
