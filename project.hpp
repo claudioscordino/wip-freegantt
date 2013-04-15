@@ -11,7 +11,10 @@ class Project
 {
 public:
 
-	Project(){}
+	Project(const std::string& name):
+	    project_name_(name),
+	    file_name_("")
+		{}
 	~Project(){}
 
 	// Resources:
@@ -176,11 +179,26 @@ public:
 
 	//Files:
 
-	inline bool loadFile(const std::string& name){
-		file_name_ = name;
-		// FIXME
+	inline bool loadProject(const std::string& file){
+		file_name_ = file;
+		project_name_ = file;
+		// TODO: load file
 		return true;
 	}
+
+	inline bool saveProject(const std::string& file){
+		// TODO: save file
+		return true;
+	}
+
+	inline std::string getProjectName() {
+		return project_name_;
+	}
+
+	inline std::string getFileName() {
+		return file_name_;
+	}
+
 
 	// Allocation:
 
@@ -216,7 +234,7 @@ private:
 	Calendar holidays_;
 
 	/// Project name:
-	std::string name_;
+	std::string project_name_;
 
 	/// Path of the project file name:
 	std::string file_name_;

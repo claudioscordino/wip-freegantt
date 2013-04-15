@@ -13,6 +13,8 @@
 #include <QGraphicsRectItem>
 #include <iostream>
 
+#define VERSION "0.3"
+
 // ==============================================
 //		COMMON PARTS
 // ==============================================
@@ -24,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	taskTable_(0),
 	resourceTable_(0),
 	ui(new Ui::MainWindow),
-	mainTab_(this),
+	mainTab_(0),
 	calendarTaskId_(0)
 {
 	ui->setupUi(this);
@@ -34,10 +36,9 @@ MainWindow::MainWindow(QWidget *parent) :
 	enableDisableMenu();
 
 	setWindowIcon(QIcon(":/images/gantt-hi.png"));
-	setWindowTitle("FreeGantt 0.3");
+	setWindowTitle("FreeGantt " VERSION);
 	calendar_.setHidden(true);
 
-	connect(&mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchToTab(int)));
 
 	// Tasks:
 	connect(newTaskAction_, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
@@ -61,13 +62,13 @@ void MainWindow::createActions()
 	newProjectAction_->setIcon(QIcon(":images/document-new.svg"));
 	newProjectAction_->setShortcut(QKeySequence::New);
 	newProjectAction_->setStatusTip(tr("Create a new project"));
-	connect(newProjectAction_, SIGNAL(triggered()), this, SLOT(newProjectSlot()));
+	connect(newProjectAction_, SIGNAL(triggered()), this, SLOT(newProject()));
 
 	openProjectAction_ = new QAction(tr("&Open Project"), this);
 	openProjectAction_->setIcon(QIcon(":images/document-open.svg"));
 	openProjectAction_->setShortcut(QKeySequence::Open);
 	openProjectAction_->setStatusTip(tr("Open a new project"));
-	connect(openProjectAction_, SIGNAL(triggered()), this, SLOT(openClicked()));
+	connect(openProjectAction_, SIGNAL(triggered()), this, SLOT(openProject()));
 
 	saveProjectAction_ = new QAction(tr("&Save Project"), this);
 	saveProjectAction_->setIcon(QIcon(":images/document-save.svg"));
@@ -101,7 +102,7 @@ void MainWindow::createActions()
 	exitAction_->setIcon(QIcon(":images/exit.svg"));
 	exitAction_->setShortcut(QKeySequence::Close);
 	exitAction_->setStatusTip(tr("Exit"));
-	connect(exitAction_, SIGNAL(triggered()), this, SLOT(exitClicked()));
+	connect(exitAction_, SIGNAL(triggered()), this, SLOT(exitProgram()));
 
 	newTaskAction_ = new QAction(tr("&New Task"), this);
 	newTaskAction_->setIcon(QIcon(":images/add.png"));
@@ -131,7 +132,7 @@ void MainWindow::createActions()
 	indentResourceAction_->setIcon(QIcon(":images/go-next.png"));
 	indentResourceAction_->setStatusTip(tr("Group resources"));
 
-	deindentResourceAction_= new QAction(tr("&Ungropu Resource"), this);
+	deindentResourceAction_= new QAction(tr("&Ungroup Resource"), this);
 	deindentResourceAction_->setIcon(QIcon(":images/go-previous.png"));
 	deindentResourceAction_->setStatusTip(tr("Ungroup resources"));
 
@@ -148,7 +149,7 @@ void MainWindow::createActions()
 	aboutAction_ = new QAction(tr("&About"), this);
 	aboutAction_->setIcon(QIcon(":images/statusWindow.png"));
 	aboutAction_->setStatusTip(tr("About FreeGantt"));
-	connect(aboutAction_, SIGNAL(triggered()), this, SLOT(aboutClicked()));
+	connect(aboutAction_, SIGNAL(triggered()), this, SLOT(aboutProgram()));
 
 	aboutQtAction_ = new QAction(tr("About &Qt"), this);
 	aboutQtAction_->setStatusTip(tr("Show information about Qt"));
@@ -172,7 +173,7 @@ void MainWindow::switchToTab(int tab_nb)
 
 void MainWindow::switchTab()
 {
-	if (mainTab_.currentIndex() == 0)
+	if (mainTab_->currentIndex() == 0)
 		switchToTab(1);
 	else
 		switchToTab(0);
@@ -211,6 +212,7 @@ void MainWindow::createMainMenu()
 	viewMenu_ = menuBar()->addMenu((tr("&View")));
 	viewMenu_->addAction(viewResourceAction_);
 	viewMenu_->addAction(viewTaskAction_);
+
 	menuBar()->addSeparator();
 
 	// About menu:
@@ -239,19 +241,6 @@ void MainWindow::enableDisableMenu()
 	}
 }
 
-void MainWindow::openClicked()
-{
-	if (saveProject()) {
-		QString fileName = QFileDialog::getOpenFileName(this,
-								tr("Open saved projects"), ".",
-								tr("FreeGantt files (*.gtt)"));
-		if (!fileName.isEmpty())
-			loadFile(fileName.toStdString());
-	}
-
-}
-
-
 void MainWindow::createMainToolbar()
 {
 	mainToolbar_ = addToolBar(tr("&Main commands"));
@@ -261,21 +250,44 @@ void MainWindow::createMainToolbar()
 
 }
 
-
-
-void MainWindow::newProjectSlot()
+void MainWindow::openProject()
 {
-	if (project_ == 0) {
-		project_ = new Project();
+	if (okToDiscardCurrentProject() > 0) {
+		QString fileName = QFileDialog::getOpenFileName(this,
+								tr("Open saved projects"), ".",
+								tr("FreeGantt files (*.ftt)"));
+		if (!fileName.isEmpty())
+			loadFile(fileName.toStdString());
+	}
+
+}
+
+
+void MainWindow::newProject()
+{
+	switch (okToDiscardCurrentProject()){
+	case 1:
+		delete mainTab_;
+		delete project_;
+	case 2:
+		project_ = new Project("Unnamed");
+		mainTab_ = new QTabWidget(this);
+		connect(mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchToTab(int)));
+
 		enableDisableMenu();
 		createTaskTab();
 		createResourceTab();
+		setWindowTitle("FreeGantt " VERSION " --- Unnamed");
+		statusBar()->showMessage(tr("Project created."), 2000);
 	}
 	switchToTaskTab();
 }
 
 
-bool MainWindow::saveProject()
+// 0 = cancel
+// 1 = project existing and saved
+// 2 = project non existing
+int MainWindow::okToDiscardCurrentProject()
 {
 	if (project_ != 0) {
 		int ret = QMessageBox::warning(this, tr("Exit"),
@@ -283,25 +295,24 @@ bool MainWindow::saveProject()
 						  "Do you want to save your changes ?"),
 					       QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
 		if (ret == QMessageBox::Yes)
-			return saveClicked();
+			return 1;
 		else if (ret == QMessageBox::Cancel)
-			return false;
+			return 0;
 	}
-	return true;
+	return 2;
 }
 
-bool MainWindow::exitClicked()
+void MainWindow::exitProgram()
 {
-	if (saveProject())
+	if (okToDiscardCurrentProject() != 0)
 		exit(1);
-	return false;
 }
 
 
-void MainWindow::aboutClicked()
+void MainWindow::aboutProgram()
 {
 	QMessageBox::about(this, tr("About FreeGantt"),
-			   "<h2>FreeGantt 0.3</h2>"
+			   "<h2>FreeGantt " VERSION "</h2>"
 			   "<p>Copyright &copy; 2013 Claudio Scordino</p>"
 			   "<p> FreeGantt is a small application to draw "
 			   "Gantt diagrams.</p>");
@@ -392,14 +403,14 @@ void MainWindow::createTaskTab()
 	taskPage->setContentsMargins(0, 0, 0, 0);
 
 	// Add the widget to the tab:
-	mainTab_.addTab(taskPage, tr("Tasks"));
-	setCentralWidget(&mainTab_);
+	mainTab_->addTab(taskPage, tr("Tasks"));
+	setCentralWidget(mainTab_);
 }
 
 
 void MainWindow::switchToTaskTab()
 {
-	mainTab_.setCurrentIndex(0);
+	mainTab_->setCurrentIndex(0);
 	newTaskAction_->setEnabled(true);
 	deleteTaskAction_->setEnabled(true);
 	indentTaskAction_->setEnabled(true);
@@ -690,14 +701,14 @@ void MainWindow::createResourceTab()
 	resourcePage->setContentsMargins(0, 0, 0, 0);
 
 	// Add the widget to the tab:
-	mainTab_.addTab(resourcePage, tr("Resources"));
-	setCentralWidget(&mainTab_);
+	mainTab_->addTab(resourcePage, tr("Resources"));
+	setCentralWidget(mainTab_);
 }
 
 
 void MainWindow::switchToResourceTab()
 {
-	mainTab_.setCurrentIndex(1);
+	mainTab_->setCurrentIndex(1);
 	newTaskAction_->setEnabled(false);
 	deleteTaskAction_->setEnabled(false);
 	indentTaskAction_->setEnabled(false);

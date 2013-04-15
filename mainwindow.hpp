@@ -31,16 +31,16 @@ public:
 
 protected:
 	inline void closeEvent(QCloseEvent* ){
-		exitClicked();
+		exitProgram();
 	}
 
 private slots:
-	bool saveProject();
-	bool exitClicked();
-	void newProjectSlot();
-	bool saveClicked(){return true;}
-	void openClicked();
-	void aboutClicked();
+	int okToDiscardCurrentProject();
+	void exitProgram();
+	void newProject();
+	bool saveProject(){return true;}
+	void openProject();
+	void aboutProgram();
 	void switchToTab(int tab);
 	void switchTab();
 	void switchToTaskTab();
@@ -64,11 +64,12 @@ private:
 	void createMainToolbar();
 	void enableDisableMenu();
 	bool loadFile(const std::string& filename){
-		return project_->loadFile(filename);
+		return project_->loadProject(filename);
 	}
 
 	void createTaskTab();
 	void createResourceTab();
+	void writeInStatusBar(const char* s, int msec);
 
 
 	Project* project_;
@@ -115,7 +116,7 @@ private:
 
 	QToolBar* mainToolbar_;
 
-	QTabWidget mainTab_;
+	QTabWidget* mainTab_;
 
 	QCalendarWidget calendar_;
 	int calendarTaskId_;
