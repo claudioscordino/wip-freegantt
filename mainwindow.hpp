@@ -64,16 +64,13 @@ private:
 	void createMainMenu();
 	void createMainToolbar();
 	void enableDisableMenu();
-	bool loadFile(const std::string& filename){
-		return project_->load(filename);
-	}
 
 	void createTaskTab();
 	void createResourceTab();
 	void writeInStatusBar(const char* s, int msec);
 
 
-	Project* project_;
+	QScopedPointer<Project> project_;
 	QTableWidget* taskTable_;
 	QTableWidget* resourceTable_;
 

@@ -215,8 +215,8 @@ void MainWindow::createMainMenu()
 
 	// View menu:
 	viewMenu_ = menuBar()->addMenu((tr("&View")));
-	viewMenu_->addAction(viewResourceAction_);
 	viewMenu_->addAction(viewTaskAction_);
+	viewMenu_->addAction(viewResourceAction_);
 
 	menuBar()->addSeparator();
 
@@ -224,7 +224,6 @@ void MainWindow::createMainMenu()
 	aboutMenu_ = menuBar()->addMenu((tr("&About")));
 	aboutMenu_->addAction(aboutAction_);
 	aboutMenu_->addAction(aboutQtAction_);
-
 }
 
 
@@ -262,7 +261,7 @@ void MainWindow::openProject()
 								tr("Open saved projects"), ".",
 								tr("FreeGantt files (*.fgt)"));
 		if (!fileName.isEmpty()){
-			loadFile(fileName.toStdString());
+			project_->load(fileName.toStdString());
 			setWindowModified(false);
 		}
 	}
@@ -271,45 +270,42 @@ void MainWindow::openProject()
 
 bool MainWindow::saveProject()
 {
-	if (project_ != 0){
-		if (project_->getFileName() == "")
-			return saveProjectAs();
-	} else {
+	if (project_.isNull())
 		return project_->save();
-	}
+
+	if (project_->getFileName() == "")
+		return saveProjectAs();
 }
 
 bool MainWindow::saveProjectAs()
 {
-	if (project_ != 0){
-		QString file_name = QFileDialog::getSaveFileName(this,
-								 tr ("Save project as"), ".",
-								 tr ("FreeGantt files (*.fgt)"));
-		if (file_name.isEmpty())
-			return false;
-		project_->setFileName(file_name.toStdString());
-		return project_->save();
-	}
-	return false;
+	if (project_.isNull())
+		return false;
+
+	QString file_name = QFileDialog::getSaveFileName(this,
+							 tr ("Save project as"), ".",
+							 tr ("FreeGantt files (*.fgt)"));
+	if (file_name.isEmpty())
+		return false;
+	project_->setFileName(file_name.toStdString());
+	return project_->save();
 }
 
 void MainWindow::newProject()
 {
 	switch (okToDiscardCurrentProject()){
 	case 1:
+		saveProject();
 		delete mainTab_;
-		delete project_;
 	case 2:
-		project_ = new Project("Untitled");
+		project_.reset(new Project("Untitled"));
 		mainTab_ = new QTabWidget(this);
 		connect(mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchToTab(int)));
 
 		enableDisableMenu();
 		createTaskTab();
 		createResourceTab();
-		//QString project_name ("FreeGantt " + QString(VERSION) + " - " + QString(project_->getName().c_str()) + " [*]");
 		setWindowTitle("FreeGantt " + QString(VERSION) + " - " + QString(project_->getName().c_str()) + " [*]");
-		//setWindowTitle(project_name);
 		statusBar()->showMessage(tr("Project created."), 2000);
 		setWindowModified(false);
 	}
@@ -322,7 +318,7 @@ void MainWindow::newProject()
 // 2 = project non existing
 int MainWindow::okToDiscardCurrentProject()
 {
-	if (project_ != 0) {
+	if (!project_.isNull()) {
 		int ret = QMessageBox::warning(this, tr("Exit"),
 					       tr("The project has been modifed.\n"
 						  "Do you want to save your changes ?"),
