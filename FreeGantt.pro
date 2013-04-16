@@ -16,7 +16,8 @@ HEADERS += allocation.hpp \
     calendar.hpp \
     set.hpp \
     item.hpp \
-    hierarchitem.hpp
+    hierarchitem.hpp \
+    options.hpp
 FORMS += mainwindow.ui
 SOURCES += allocation.cpp \
            main.cpp \
@@ -27,5 +28,6 @@ SOURCES += allocation.cpp \
     calendar.cpp \
     item.cpp \
     hierarchitem.cpp \
-    set.cpp
+    set.cpp \
+    options.cpp
 RESOURCES += freegantt.qrc

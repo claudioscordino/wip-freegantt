@@ -12,6 +12,7 @@
 #include <QCalendarWidget>
 
 #include "project.hpp"
+#include "options.hpp"
 
 
 namespace Ui {
@@ -58,6 +59,7 @@ private slots:
 	void deindentResourceSlot();
 	void resourceValueChanged(int row, int column);
 	void changeTaskBegin();
+	void showOptions();
 
 private:
 	void createActions();
@@ -73,6 +75,7 @@ private:
 	QScopedPointer<Project> project_;
 	QTableWidget* taskTable_;
 	QTableWidget* resourceTable_;
+	Options options_;
 
 	Ui::MainWindow *ui;
 

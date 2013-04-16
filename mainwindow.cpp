@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	project_(0),
 	taskTable_(0),
 	resourceTable_(0),
+	options_(this),
 	ui(new Ui::MainWindow),
 	mainTab_(0),
 	calendarTaskId_(0)
@@ -38,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	setWindowIcon(QIcon(":/images/gantt-hi.png"));
 	setWindowTitle("FreeGantt " VERSION);
 	calendar_.setHidden(true);
-
+	options_.setHidden(true);
 
 	// Tasks:
 	connect(newTaskAction_, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
@@ -84,7 +85,6 @@ void MainWindow::createActions()
 	saveAsProjectAction_->setStatusTip(tr("Save the current project with a new name"));
 	connect(saveAsProjectAction_, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 
-
 	recentProjectsAction_ = new QAction(tr("&Open recent projects"), this);
 	recentProjectsAction_->setIcon(QIcon(":images/document-open-recent.png"));
 	recentProjectsAction_->setStatusTip(tr("Open a recent project"));
@@ -102,6 +102,7 @@ void MainWindow::createActions()
 	optionsPanelAction_->setShortcut(QKeySequence::Close);
 	optionsPanelAction_->setIcon(QIcon(":images/preferences-desktop.svg"));
 	optionsPanelAction_->setStatusTip(tr("Set options"));
+	connect(optionsPanelAction_, SIGNAL(triggered()), this, SLOT(showOptions()));
 
 	exitAction_ = new QAction(tr("&Exit"), this);
 	exitAction_->setIcon(QIcon(":images/exit.svg"));
@@ -166,6 +167,11 @@ void MainWindow::createActions()
 	connect(switchTabAction_, SIGNAL(triggered()), this, SLOT(switchTab()));
 }
 
+
+void MainWindow::showOptions()
+{
+	options_.setVisible(true);
+}
 
 // 0 = Tasks; 1 = Resources
 void MainWindow::switchToTab(int tab_nb)
@@ -271,10 +277,12 @@ void MainWindow::openProject()
 bool MainWindow::saveProject()
 {
 	if (project_.isNull())
-		return project_->save();
+		return false;
 
 	if (project_->getFileName() == "")
 		return saveProjectAs();
+	else
+		return project_->save();
 }
 
 bool MainWindow::saveProjectAs()
