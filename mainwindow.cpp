@@ -378,10 +378,10 @@ void MainWindow::createTaskTab()
 	taskPage_.reset(new TaskPage(project_.data(), this));
 
 	// Tasks:
-	connect(newTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(newTaskSlot()));
-	connect(deleteTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(removeTaskSlot()));
-	connect(indentTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(indentTaskSlot()));
-	connect(deindentTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(deindentTaskSlot()));
+	connect(newTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(newItem()));
+	connect(deleteTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(removeItem()));
+	connect(indentTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(indentItem()));
+	connect(deindentTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(deindentItem()));
 
 	// Add the widget to the tab:
 	mainTab_->addTab(taskPage_.data(), tr("Tasks"));

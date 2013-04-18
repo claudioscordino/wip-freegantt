@@ -8,51 +8,46 @@
 #include <QGraphicsView>
 
 #include "project.hpp"
+#include "page.hpp"
 
-class TaskPage : public QWidget
+class TaskPage : public Page
 {
 	Q_OBJECT
 public:
 	explicit TaskPage(Project* project, QMainWindow *parent = 0);
-	void refreshList();
-	~TaskPage(){
-		delete taskTable_;
-	}
+#if 1
+	virtual void refreshTable();
+#endif
 
-
+#if 1
 public slots:
-	void newTaskSlot();
-	void removeTaskSlot();
-	void indentTaskSlot();
-	void deindentTaskSlot();
+	virtual void newItem();
+	virtual void removeItem();
+	virtual void indentItem();
+	virtual void deindentItem();
+#endif
+
+#if 1
+protected slots:
+	virtual void valueChanged(int row, int column);
+	virtual void valueClicked(int row, int column);
+#endif
+
 
 private slots:
 	void changeTaskBegin();
-	void taskValueChanged(int row, int column);
-	void taskValueClicked(int row, int column);
-
 
 private:
-	void createTable();
-	void createScene();
-	void createToolbar(QMainWindow *parent);
-	void createLayout();
-	void createActions();
 
-	Project* project_;
+#if 1
+	virtual void createTable();
+	virtual void createScene();
+	virtual void createToolbar();
+	virtual void createLayout();
+	virtual void createActions();
+#endif
 	QCalendarWidget calendar_;
 	int calendarTaskId_;
-
-
-	QAction* indentTaskAction_;
-	QAction* deindentTaskAction_;
-	QAction* newTaskAction_;
-	QAction* deleteTaskAction_;
-
-	QTableWidget* taskTable_;
-	QGraphicsView* taskView_;
-	QToolBar* taskToolbar_;
-
 
 
 };
