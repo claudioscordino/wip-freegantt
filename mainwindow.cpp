@@ -23,12 +23,12 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	project_(0),
-	taskTable_(0),
 	resourceTable_(0),
 	options_(this),
+	taskPage_(0),
 	ui(new Ui::MainWindow),
-	mainTab_(0),
-	calendarTaskId_(0)
+	mainToolbar_(0),
+	mainTab_(0)
 {
 	ui->setupUi(this);
 	createActions();
@@ -38,19 +38,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	setWindowIcon(QIcon(":/images/gantt-hi.png"));
 	setWindowTitle("FreeGantt " VERSION);
-	calendar_.setHidden(true);
 	options_.setHidden(true);
-
-	// Tasks:
-	connect(newTaskAction_, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
-	connect(deleteTaskAction_, SIGNAL(triggered()), this, SLOT(removeTaskSlot()));
-	connect(indentTaskAction_, SIGNAL(triggered()), this, SLOT(indentTaskSlot()));
-	connect(deindentTaskAction_, SIGNAL(triggered()), this, SLOT(deindentTaskSlot()));
 
 	// Resources:
 	connect(newResourceAction_, SIGNAL(triggered()), this, SLOT(newResourceSlot()));
 	connect(deleteResourceAction_, SIGNAL(triggered()), this, SLOT(removeResourceSlot()));
-	connect(indentResourceAction_, SIGNAL(triggered()), this, SLOT(indentResourceSlot()));
+	connect(indentResourceAction_, SIGNAL(triggered(
+						      )), this, SLOT(indentResourceSlot()));
 	connect(deindentResourceAction_, SIGNAL(triggered()), this, SLOT(deindentResourceSlot()));
 
 	setWindowModified(false);
@@ -257,7 +251,6 @@ void MainWindow::createMainToolbar()
 	mainToolbar_->addAction(newProjectAction_);
 	mainToolbar_->addAction(openProjectAction_);
 	mainToolbar_->addAction(saveProjectAction_);
-
 }
 
 void MainWindow::openProject()
@@ -276,7 +269,7 @@ void MainWindow::openProject()
 
 bool MainWindow::saveProject()
 {
-	if (project_.isNull())
+	if (project_ == 0)
 		return false;
 
 	if (project_->getFileName() == "")
@@ -287,7 +280,7 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
-	if (project_.isNull())
+	if (project_ == 0)
 		return false;
 
 	QString file_name = QFileDialog::getSaveFileName(this,
@@ -306,13 +299,25 @@ void MainWindow::newProject()
 		saveProject();
 		delete mainTab_;
 	case 2:
-		project_.reset(new Project("Untitled"));
+		if (project_ == 0)
+			std::cerr << "1. Project == 0" << std::endl;
+		project_ = new Project("Untitled");
+		if (project_ == 0)
+			std::cerr << "2. Project == 0" << std::endl;
+
+
 		mainTab_ = new QTabWidget(this);
 		connect(mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchToTab(int)));
 
-		enableDisableMenu();
+		// These two calls need mainTab_ already allocated:
 		createTaskTab();
 		createResourceTab();
+
+		enableDisableMenu();
+
+		std::cerr << "Project name: " << project_->getName() << std::endl;
+		std::cerr << "Bye" << std::endl;
+
 		setWindowTitle("FreeGantt " + QString(VERSION) + " - " + QString(project_->getName().c_str()) + " [*]");
 		statusBar()->showMessage(tr("Project created."), 2000);
 		setWindowModified(false);
@@ -326,7 +331,7 @@ void MainWindow::newProject()
 // 2 = project non existing
 int MainWindow::okToDiscardCurrentProject()
 {
-	if (!project_.isNull()) {
+	if (project_ != 0) {
 		int ret = QMessageBox::warning(this, tr("Exit"),
 					       tr("The project has been modifed.\n"
 						  "Do you want to save your changes ?"),
@@ -370,77 +375,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::createTaskTab()
 {
-	// Create left table:
-	taskTable_ = new QTableWidget(0, 4);
-	taskTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	taskTable_->setColumnHidden(0, true);
-	connect(taskTable_, SIGNAL(cellChanged(int, int)), this, SLOT(taskValueChanged(int, int)));
-	connect(taskTable_, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(taskValueClicked(int, int)));
-	QStringList labels;
-	labels.append("Id");
-	labels.append("Name");
-	labels.append("Begin");
-	labels.append("Duration");
-	taskTable_->setHorizontalHeaderLabels(labels);
-	taskTable_->verticalHeader()->setVisible(false);
-	taskTable_->setMinimumWidth(230);
-	taskTable_->setMaximumWidth(230);
-	taskTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
+	taskPage_ = new TaskPage(project_, this);
 
-	// Set width of the three columns:
-	taskTable_->setColumnWidth(0, 50);
-	taskTable_->setColumnWidth(1, 80);
-	taskTable_->setColumnWidth(2, 80);
-	taskTable_->setColumnWidth(3, 70);
-
-	// Create left scene:
-	QGraphicsScene* taskScene = new QGraphicsScene(this);
-	QGraphicsRectItem *rect = new QGraphicsRectItem();
-	rect->setRect(0, 0, 100, 10);
-	taskScene->addItem(rect);
-	QGraphicsView* taskView = new QGraphicsView(taskScene);
-	taskView->show();
-
-	QToolBar* taskToolbar = addToolBar(tr("&Task toolbar"));
-
-
-	taskToolbar->addAction(newTaskAction_);
-	taskToolbar->addAction(deleteTaskAction_);
-	taskToolbar->addSeparator();
-
-	taskToolbar->setBaseSize(230, 20);
-
-	taskToolbar->addAction(deindentTaskAction_);
-	taskToolbar->addAction(indentTaskAction_);
-
-	QVBoxLayout* taskLeftLayout = new QVBoxLayout();
-	taskLeftLayout->addWidget(taskToolbar);
-	taskLeftLayout->addWidget(taskTable_);
-	taskLeftLayout->setSpacing(0);
-	taskLeftLayout->setMargin(0);
-	taskLeftLayout->setContentsMargins(0, 0, 0, 0);
-	QWidget* taskLeftContent = new QWidget();
-	taskLeftContent->setLayout(taskLeftLayout);
-	taskLeftContent->setContentsMargins(0, 0, 0, 0);
-	taskLeftContent->setMinimumHeight(230);
-	taskLeftContent->setMaximumWidth(230);
-
-	// Create a layout (HBox) to contain table + scene:
-	QHBoxLayout* taskPageLayout = new QHBoxLayout();
-	//layout->addWidget(resourceTable);
-	taskPageLayout->addWidget(taskLeftContent);
-	taskPageLayout->addWidget(taskView);
-	taskPageLayout->setSpacing(0);
-	taskPageLayout->setMargin(0);
-	taskPageLayout->setContentsMargins(0, 0, 0, 0);
-
-	// Use a widget to set the layout:
-	QWidget* taskPage = new QWidget();
-	taskPage->setLayout(taskPageLayout);
-	taskPage->setContentsMargins(0, 0, 0, 0);
+	// Tasks:
+	connect(newTaskAction_, SIGNAL(triggered()), taskPage_, SLOT(newTaskSlot()));
+	connect(deleteTaskAction_, SIGNAL(triggered()), taskPage_, SLOT(removeTaskSlot()));
+	connect(indentTaskAction_, SIGNAL(triggered()), taskPage_, SLOT(indentTaskSlot()));
+	connect(deindentTaskAction_, SIGNAL(triggered()), taskPage_, SLOT(deindentTaskSlot()));
 
 	// Add the widget to the tab:
-	mainTab_->addTab(taskPage, tr("Tasks"));
+	mainTab_->addTab(taskPage_, tr("Tasks"));
 	setCentralWidget(mainTab_);
 }
 
@@ -460,217 +404,11 @@ void MainWindow::switchToTaskTab()
 	deindentResourceAction_->setEnabled(false);
 }
 
-void MainWindow::refreshTaskTable()
-{
-	taskTable_->blockSignals(true);
-
-	// Delete table and items:
-	for (int r = taskTable_->rowCount(); r >= 0; --r)
-		taskTable_->removeRow(r);
-
-	for (int i = 0; i < project_->getTasksSize(); ++i){
-		Task* t = project_->getTaskSequentially(i);
-
-		// Children will be printed after their parent:
-		if (t->getParent() != 0)
-			continue;
-
-		taskTable_->insertRow(taskTable_->rowCount());
-
-		QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
-		newItemTaskId->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-		newItemTaskId->setText(QString::number(t->getId()));
-		taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
-
-		QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
-		newItemTaskName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		newItemTaskName->setText(QString::fromStdString(t->getName()));
-		taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
-
-		if (t->getChildrenSize() == 0){
-
-			// In case it has no children, print Begin and Duration:
-
-			QTableWidgetItem *newItemBegin = new QTableWidgetItem();
-			newItemBegin->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-			newItemBegin->setText(t->getBegin().toString("dd.MM.yyyy"));
-			taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
-
-			QTableWidgetItem *newItemDuration = new QTableWidgetItem();
-			newItemDuration->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-			newItemDuration->setText(QString::number(t->getDuration()));
-			taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
-
-		} else {
-			QFont font = newItemTaskName->font();
-			font.setBold(true);
-			newItemTaskName->setFont(font);
-			newItemTaskId->setFont(font);
 
 
-			// Print children:
-			for (int c = 0; c < t->getChildrenSize(); ++c){
-				Task* ch = t->getChildrenSequentially(c);
-				std::cout << "Task " << t->getId() << " has child " << ch->getId() << std::endl;
 
 
-				taskTable_->insertRow(taskTable_->rowCount());
 
-				QTableWidgetItem *newItemTaskId = new QTableWidgetItem();
-				newItemTaskId->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-				newItemTaskId->setText(QString::number(ch->getId()));
-				taskTable_->setItem(taskTable_->rowCount()-1, 0, newItemTaskId);
-
-				QTableWidgetItem *newItemTaskName = new QTableWidgetItem();
-				newItemTaskName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-
-				QFont font = newItemTaskName->font();
-				font.setItalic(true);
-				newItemTaskName->setFont(font);
-
-				newItemTaskName->setText(QString::fromStdString("   " + ch->getName()));
-				taskTable_->setItem(taskTable_->rowCount()-1, 1, newItemTaskName);
-
-				QTableWidgetItem *newItemBegin = new QTableWidgetItem();
-				//QDateEdit* newItemBegin = new QDateEdit();
-				newItemBegin->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-				newItemBegin->setText(ch->getBegin().toString("dd.MM.yyyy"));
-				taskTable_->setItem(taskTable_->rowCount()-1, 2, newItemBegin);
-
-				QTableWidgetItem *newItemDuration = new QTableWidgetItem();
-				newItemDuration->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-				newItemDuration->setText(QString::number(ch->getDuration()));
-				taskTable_->setItem(taskTable_->rowCount()-1, 3, newItemDuration);
-			}
-		}
-	}
-	taskTable_->blockSignals(false);
-
-}
-
-void MainWindow::newTaskSlot()
-{
-	project_->addTask(new Task("New task"));
-	setWindowModified(true);
-	refreshTaskTable();
-}
-
-void MainWindow::removeTaskSlot()
-{
-	int row = taskTable_->currentRow();
-	if (row < 0 || row > taskTable_->rowCount())
-		return;
-	int id = taskTable_->item(row, 0)->text().toInt();
-	project_->removeTask(id);
-	setWindowModified(true);
-	refreshTaskTable();
-}
-
-void MainWindow::indentTaskSlot()
-{
-	int row = taskTable_->currentRow();
-
-	// No row selected:
-	if (row < 1 || row > taskTable_->rowCount())
-		return;
-
-	int child = taskTable_->item(row, 0)->text().toInt();
-
-	std::cerr << " Child id: " << child << std::endl;
-
-	// Task is already a child:
-	if (project_->getParentTask(child) != 0) {
-		std::cerr << " Child already has a parent" << std::endl;
-		return;
-	}
-
-	std::cerr << "Child does not have parent" << std::endl;
-
-
-	// Iterate backward to find the new parent:
-	while (project_->getTaskFromId(taskTable_->item(row-1, 0)->text().toInt())->getParent() != 0)
-		row--;
-	int parent = taskTable_->item(row-1, 0)->text().toInt();
-	std::cerr << "Parent id: " << parent << std::endl;
-
-	project_->addChildTask(parent, project_->getTaskFromId(child));
-	setWindowModified(true);
-	refreshTaskTable();
-}
-
-void MainWindow::deindentTaskSlot()
-{
-	int row = taskTable_->currentRow();
-
-	// No row selected:
-	if (row < 1 || row > taskTable_->rowCount())
-		return;
-
-	int child = taskTable_->item(row, 0)->text().toInt();
-	std::cout << "Deindenting task " << child << std::endl;
-
-	project_->removeChildTask(project_->getTaskFromId(child));
-	setWindowModified(true);
-	refreshTaskTable();
-}
-
-void MainWindow::taskValueChanged(int row, int column)
-{
-	std::cout << "item changed! row: " << row << " column: " << column << std::endl;
-
-	// No row selected:
-	if (row < 0 || row > taskTable_->rowCount())
-		return;
-
-	int id = taskTable_->item(row, 0)->text().toInt();
-
-	switch(column) {
-	case 1:
-		std::cout << "Task name changed!" << std::endl;
-		project_->getTaskFromId(id)->setName(taskTable_->item(row, column)->text().toStdString());
-		break;
-	case 3:
-		std::cout << "Duration changed!" << std::endl;
-		if (taskTable_->item(row, column)->text().toInt() >= 0)
-			project_->getTaskFromId(id)->setDuration(taskTable_->item(row, column)->text().toInt());
-		break;
-	}
-	setWindowModified(true);
-	refreshTaskTable();
-}
-
-
-void MainWindow::changeTaskBegin()
-{
-	if (calendar_.isHidden() == false) {
-		std::cerr << "Changing beginning for Task: " << calendarTaskId_ << std::endl;
-		project_->setTaskBeginning(calendarTaskId_, calendar_.selectedDate());
-		std::cerr << "-2-" << std::endl;
-		calendar_.setHidden(true);
-		std::cerr << "New date: " << project_->getTaskFromId(calendarTaskId_)->getBegin().toString("dd.MM.yyyy").toStdString() << std::endl;
-		setWindowModified(true);
-		refreshTaskTable();
-	}
-}
-
-
-void MainWindow::taskValueClicked(int row, int column)
-{
-	std::cout << "item clicked! row: " << row << " column: " << column << std::endl;
-
-	// No row selected:
-	if (row < 0 || row > taskTable_->rowCount())
-		return;
-
-	if ((column == 2) && (calendar_.isHidden() == true)){
-		int id = taskTable_->item(row, 0)->text().toInt();
-		calendarTaskId_ = id;
-		calendar_.setSelectedDate(project_->getTaskFromId(id)->getBegin());
-		calendar_.setWindowTitle(QString("Select begin date"));
-		calendar_.setHidden(false);
-		connect (&calendar_, SIGNAL(selectionChanged()), this, SLOT(changeTaskBegin()));
-	}
-}
 
 
 

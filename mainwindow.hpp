@@ -13,6 +13,7 @@
 
 #include "project.hpp"
 #include "options.hpp"
+#include "taskpage.hpp"
 
 
 namespace Ui {
@@ -25,7 +26,6 @@ class MainWindow : public QMainWindow
 
 public:
 	explicit MainWindow(QWidget *parent = 0);
-	void refreshTaskTable();
 	void refreshResourceTable();
 	~MainWindow();
 
@@ -47,18 +47,13 @@ private slots:
 	void switchTab();
 	void switchToTaskTab();
 	void switchToResourceTab();
-	void newTaskSlot();
-	void removeTaskSlot();
-	void indentTaskSlot();
-	void deindentTaskSlot();
-	void taskValueChanged(int row, int column);
-	void taskValueClicked(int row, int column);
+
 	void newResourceSlot();
 	void removeResourceSlot();
 	void indentResourceSlot();
 	void deindentResourceSlot();
 	void resourceValueChanged(int row, int column);
-	void changeTaskBegin();
+
 	void showOptions();
 
 private:
@@ -72,10 +67,12 @@ private:
 	void writeInStatusBar(const char* s, int msec);
 
 
-	QScopedPointer<Project> project_;
-	QTableWidget* taskTable_;
+	Project* project_;
+
 	QTableWidget* resourceTable_;
 	Options options_;
+
+	TaskPage* taskPage_;
 
 	Ui::MainWindow *ui;
 
@@ -92,12 +89,16 @@ private:
 	QAction* optionsPanelAction_;
 	QAction* switchTabAction_;
 
+	QAction* indentTaskAction_;
+	QAction* deindentTaskAction_;
+	QAction* newTaskAction_;
+	QAction* deleteTaskAction_;
+
 	// Edit menu:
 	QMenu* editMenu_;
 	QAction* newResourceAction_;
 	QAction* deleteResourceAction_;
-	QAction* newTaskAction_;
-	QAction* deleteTaskAction_;
+
 
 	// View menu:
 	QMenu* viewMenu_;
@@ -110,17 +111,12 @@ private:
 	QAction* aboutQtAction_;
 
 	// Main toolbar
-	QAction* indentTaskAction_;
-	QAction* deindentTaskAction_;
 	QAction* indentResourceAction_;
 	QAction* deindentResourceAction_;
 
 	QToolBar* mainToolbar_;
-
 	QTabWidget* mainTab_;
 
-	QCalendarWidget calendar_;
-	int calendarTaskId_;
 
 };
 
