@@ -39,14 +39,6 @@ MainWindow::MainWindow(QWidget *parent) :
 	setWindowIcon(QIcon(":/images/gantt-hi.png"));
 	setWindowTitle("FreeGantt " VERSION);
 	options_.setHidden(true);
-
-	// Resources:
-	connect(newResourceAction_, SIGNAL(triggered()), this, SLOT(newResourceSlot()));
-	connect(deleteResourceAction_, SIGNAL(triggered()), this, SLOT(removeResourceSlot()));
-	connect(indentResourceAction_, SIGNAL(triggered(
-						      )), this, SLOT(indentResourceSlot()));
-	connect(deindentResourceAction_, SIGNAL(triggered()), this, SLOT(deindentResourceSlot()));
-
 	setWindowModified(false);
 }
 
@@ -305,7 +297,6 @@ void MainWindow::newProject()
 		if (project_.isNull())
 			std::cerr << "2. Project == 0" << std::endl;
 
-
 		mainTab_ = new QTabWidget(this);
 		connect(mainTab_, SIGNAL(currentChanged(int)), this, SLOT(switchToTab(int)));
 
@@ -410,81 +401,10 @@ void MainWindow::switchToTaskTab()
 
 
 
-
-
-
 // ==============================================
 //		RESOURCES
 // ==============================================
 
-void MainWindow::createResourceTab()
-{
-	// Create left table:
-	resourceTable_ = new QTableWidget(0, 3);
-	resourceTable_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	resourceTable_->setColumnHidden(0, true);
-	connect(resourceTable_, SIGNAL(cellChanged(int, int)), this, SLOT(resourceValueChanged(int, int)));
-	QStringList labels;
-	labels.append("Id");
-	labels.append("Name/Group");
-	labels.append("Role");
-	resourceTable_->setHorizontalHeaderLabels(labels);
-	resourceTable_->verticalHeader()->setVisible(false);
-	resourceTable_->setMinimumWidth(160);
-	resourceTable_->setMaximumWidth(160);
-	resourceTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-	resourceTable_->setColumnWidth(0, 50);
-	resourceTable_->setColumnWidth(1, 90);
-	resourceTable_->setColumnWidth(2, 70);
-
-	// Create left scene:
-	QGraphicsScene* resourceScene = new QGraphicsScene(this);
-	QGraphicsRectItem *rect = new QGraphicsRectItem();
-	rect->setRect(0, 0, 100, 10);
-	resourceScene->addItem(rect);
-	QGraphicsView* resourceView = new QGraphicsView(resourceScene);
-	resourceView->show();
-
-	QToolBar* resourceToolbar = addToolBar(tr("&Resource toolbar"));
-	resourceToolbar->addAction(newResourceAction_);
-	resourceToolbar->addAction(deleteResourceAction_);
-	resourceToolbar->addSeparator();
-	resourceToolbar->setBaseSize(160, 20);
-	resourceToolbar->addAction(deindentResourceAction_);
-	resourceToolbar->addAction(indentResourceAction_);
-
-
-	QVBoxLayout* resourceLeftLayout = new QVBoxLayout();
-	resourceLeftLayout->addWidget(resourceToolbar);
-	resourceLeftLayout->addWidget(resourceTable_);
-	resourceLeftLayout->setSpacing(0);
-	resourceLeftLayout->setMargin(0);
-	resourceLeftLayout->setContentsMargins(0, 0, 0, 0);
-	QWidget* resourceLeftContent = new QWidget();
-	resourceLeftContent->setLayout(resourceLeftLayout);
-	resourceLeftContent->setContentsMargins(0, 0, 0, 0);
-	resourceLeftContent->setMinimumHeight(160);
-	resourceLeftContent->setMaximumWidth(160);
-
-	// Create a layout (HBox) to contain table + scene:
-	QHBoxLayout* resourcePageLayout = new QHBoxLayout();
-	//layout->addWidget(resourceTable_);
-	resourcePageLayout->addWidget(resourceLeftContent);
-	resourcePageLayout->addWidget(resourceView);
-	resourcePageLayout->setSpacing(0);
-	resourcePageLayout->setMargin(0);
-	resourcePageLayout->setContentsMargins(0, 0, 0, 0);
-
-	// Use a widget to set the layout:
-	QWidget* resourcePage = new QWidget();
-	resourcePage->setLayout(resourcePageLayout);
-	resourcePage->setContentsMargins(0, 0, 0, 0);
-
-	// Add the widget to the tab:
-	mainTab_->addTab(resourcePage, tr("Resources"));
-	setCentralWidget(mainTab_);
-}
 
 
 void MainWindow::switchToResourceTab()
@@ -504,169 +424,29 @@ void MainWindow::switchToResourceTab()
 }
 
 
-void MainWindow::refreshResourceTable()
+void MainWindow::createResourceTab()
 {
-	resourceTable_->blockSignals(true);
+	resourcePage_.reset(new ResourcePage(project_.data(), this));
 
-	// Delete table and items:
-	for (int r = resourceTable_->rowCount(); r >= 0; --r)
-		resourceTable_->removeRow(r);
+	// Resources:
+	connect(newResourceAction_, SIGNAL(triggered()), resourcePage_.data(), SLOT(newItem()));
+	connect(deleteResourceAction_, SIGNAL(triggered()), resourcePage_.data(), SLOT(removeItem()));
+	connect(indentResourceAction_, SIGNAL(triggered()), resourcePage_.data(), SLOT(indentItem()));
+	connect(deindentResourceAction_, SIGNAL(triggered()), resourcePage_.data(), SLOT(deindentItem()));
 
-	for (int i = 0; i < project_->getResourcesSize(); ++i){
-		Resource* t = project_->getResourcesSequentially(i);
-
-		// Children will be printed after their parent:
-		if (t->getParent() != 0)
-			continue;
-
-		resourceTable_->insertRow(resourceTable_->rowCount());
-
-		QTableWidgetItem *newItemResourceId = new QTableWidgetItem();
-		newItemResourceId->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-		newItemResourceId->setText(QString::number(t->getId()));
-		resourceTable_->setItem(resourceTable_->rowCount()-1, 0, newItemResourceId);
-
-		QTableWidgetItem *newItemResourceName = new QTableWidgetItem();
-		newItemResourceName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		newItemResourceName->setText(QString::fromStdString(t->getName()));
-		resourceTable_->setItem(resourceTable_->rowCount()-1, 1, newItemResourceName);
-
-		QTableWidgetItem *newItemResourceRole = new QTableWidgetItem();
-		newItemResourceRole->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		newItemResourceRole->setText(QString::fromStdString(t->getRole()));
-		resourceTable_->setItem(resourceTable_->rowCount()-1, 2, newItemResourceRole);
-
-
-		if (t->getChildrenSize() > 0){
-			QFont font = newItemResourceName->font();
-			font.setBold(true);
-			newItemResourceName->setFont(font);
-			newItemResourceId->setFont(font);
-			newItemResourceRole->setFont(font);
-
-			// Print children:
-			for (int c = 0; c < t->getChildrenSize(); ++c){
-				Resource* ch = t->getChildrenSequentially(c);
-				std::cout << "Resource " << t->getId() << " has child " << ch->getId() << std::endl;
-
-				resourceTable_->insertRow(resourceTable_->rowCount());
-
-				QTableWidgetItem *newItemResourceId = new QTableWidgetItem();
-				newItemResourceId->setTextAlignment(Qt::AlignCenter | Qt::AlignVCenter);
-				newItemResourceId->setText(QString::number(ch->getId()));
-				resourceTable_->setItem(resourceTable_->rowCount()-1, 0, newItemResourceId);
-
-				QTableWidgetItem *newItemResourceName = new QTableWidgetItem();
-				newItemResourceName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-
-				QFont font = newItemResourceName->font();
-				font.setItalic(true);
-				newItemResourceName->setFont(font);
-
-				newItemResourceName->setText(QString::fromStdString("   " + ch->getName()));
-				resourceTable_->setItem(resourceTable_->rowCount()-1, 1, newItemResourceName);
-
-				QTableWidgetItem *newItemResourceRole = new QTableWidgetItem();
-				newItemResourceRole->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-				newItemResourceRole->setText(QString::fromStdString(ch->getRole()));
-				resourceTable_->setItem(resourceTable_->rowCount()-1, 2, newItemResourceRole);
-			}
-		}
-	}
-	resourceTable_->blockSignals(false);
-
+	// Add the widget to the tab:
+	mainTab_->addTab(resourcePage_.data(), tr("Resources"));
+	setCentralWidget(mainTab_);
 }
 
 
-void MainWindow::newResourceSlot()
-{
-	project_->addResource(new Resource("New resource"));
-	refreshResourceTable();
-}
 
 
-void MainWindow::removeResourceSlot()
-{
-	int row = resourceTable_->currentRow();
-	if (row < 0 || row > resourceTable_->rowCount())
-		return;
-	int id = resourceTable_->item(row, 0)->text().toInt();
-	std::cerr << "Row: " << row << " Id: " << id << std::endl;
-	project_->removeResource(id);
-	setWindowModified(true);
-	refreshResourceTable();
-}
 
 
-void MainWindow::indentResourceSlot()
-{
-	int row = resourceTable_->currentRow();
-
-	// No row selected:
-	if (row < 1 || row > resourceTable_->rowCount())
-		return;
-
-	int child = resourceTable_->item(row, 0)->text().toInt();
-
-	std::cerr << " Child id: " << child << std::endl;
-
-	// Resource is already a child:
-	if (project_->getParentResource(child) != 0) {
-		std::cerr << " Child already has a parent" << std::endl;
-		return;
-	}
-
-	std::cerr << "Child does not have parent" << std::endl;
 
 
-	// Iterate backward to find the new parent:
-	while (project_->getResourceFromId(resourceTable_->item(row-1, 0)->text().toInt())->getParent() != 0)
-		row--;
-	int parent = resourceTable_->item(row-1, 0)->text().toInt();
-	std::cerr << "Parent id: " << parent << std::endl;
 
-	project_->addChildResource(parent, project_->getResourceFromId(child));
-	setWindowModified(true);
-	refreshResourceTable();
-}
-
-
-void MainWindow::deindentResourceSlot()
-{
-	int row = resourceTable_->currentRow();
-
-	// No row selected:
-	if (row < 1 || row > resourceTable_->rowCount())
-		return;
-
-	int child = resourceTable_->item(row, 0)->text().toInt();
-	std::cout << "Deindenting resource " << child << std::endl;
-
-	project_->removeChildResource(project_->getResourceFromId(child));
-	setWindowModified(true);
-	refreshResourceTable();
-}
-
-
-void MainWindow::resourceValueChanged(int row, int column)
-{
-	std::cout << "item changed! row: " << row << " column: " << column << std::endl;
-
-	// No row selected:
-	if (row < 0 || row > resourceTable_->rowCount())
-		return;
-
-	int id = resourceTable_->item(row, 0)->text().toInt();
-	if (column == 1) {
-		std::cout << "Resource name changed!" << std::endl;
-		project_->getResourceFromId(id)->setName(resourceTable_->item(row, column)->text().toStdString());
-	} else if (column == 2) {
-		std::cout << "Role changed!" << std::endl;
-		project_->getResourceFromId(id)->setRole(resourceTable_->item(row, column)->text().toStdString());
-	}
-	setWindowModified(true);
-	refreshResourceTable();
-}
 
 
 

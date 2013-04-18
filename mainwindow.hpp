@@ -14,7 +14,7 @@
 #include "project.hpp"
 #include "options.hpp"
 #include "taskpage.hpp"
-
+#include "resourcepage.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -48,12 +48,6 @@ private slots:
 	void switchToTaskTab();
 	void switchToResourceTab();
 
-	void newResourceSlot();
-	void removeResourceSlot();
-	void indentResourceSlot();
-	void deindentResourceSlot();
-	void resourceValueChanged(int row, int column);
-
 	void showOptions();
 
 private:
@@ -73,6 +67,7 @@ private:
 	Options options_;
 
 	QScopedPointer<TaskPage> taskPage_;
+	QScopedPointer<ResourcePage> resourcePage_;
 
 	Ui::MainWindow *ui;
 
@@ -116,8 +111,6 @@ private:
 
 	QToolBar* mainToolbar_;
 	QTabWidget* mainTab_;
-
-
 };
 
 #endif // MAINWINDOW_HPP

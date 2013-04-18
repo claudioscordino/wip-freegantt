@@ -19,7 +19,8 @@ HEADERS += allocation.hpp \
     hierarchitem.hpp \
     options.hpp \
     taskpage.hpp \
-    page.hpp
+    page.hpp \
+    resourcepage.hpp
 FORMS += mainwindow.ui
 SOURCES += allocation.cpp \
            main.cpp \
@@ -33,5 +34,6 @@ SOURCES += allocation.cpp \
     set.cpp \
     options.cpp \
     taskpage.cpp \
-    page.cpp
+    page.cpp \
+    resourcepage.cpp
 RESOURCES += freegantt.qrc
