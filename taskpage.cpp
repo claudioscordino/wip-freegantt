@@ -28,10 +28,8 @@ TaskPage::TaskPage(Project* project, QMainWindow *parent) :
 	calendar_.setHidden(true);
 	createActions();
 	createTable();
-	if (parent != 0){
-		createScene(parent);
-		createToolbar(parent);
-	}
+	createScene();
+	createToolbar(parent);
 	createLayout();
 }
 
@@ -52,6 +50,12 @@ void TaskPage::createActions()
 	deindentTaskAction_ = new QAction(tr("&Deindent Task"), this);
 	deindentTaskAction_->setIcon(QIcon(":images/go-previous.png"));
 	deindentTaskAction_->setStatusTip(tr("Deindent the selected task"));
+
+	// Tasks:
+	connect(newTaskAction_, SIGNAL(triggered()), this, SLOT(newTaskSlot()));
+	connect(deleteTaskAction_, SIGNAL(triggered()), this, SLOT(removeTaskSlot()));
+	connect(indentTaskAction_, SIGNAL(triggered()), this, SLOT(indentTaskSlot()));
+	connect(deindentTaskAction_, SIGNAL(triggered()), this, SLOT(deindentTaskSlot()));
 }
 
 void TaskPage::createTable()
@@ -79,12 +83,13 @@ void TaskPage::createTable()
 	taskTable_->setColumnWidth(1, 80);
 	taskTable_->setColumnWidth(2, 80);
 	taskTable_->setColumnWidth(3, 70);
+	taskTable_->show();
 }
 
-void TaskPage::createScene(QMainWindow *parent)
+void TaskPage::createScene()
 {
 	// Create left scene:
-	QGraphicsScene* taskScene = new QGraphicsScene(parent);
+	QGraphicsScene* taskScene = new QGraphicsScene(this);
 	QGraphicsRectItem *rect = new QGraphicsRectItem();
 	rect->setRect(0, 0, 100, 10);
 	taskScene->addItem(rect);
@@ -94,13 +99,15 @@ void TaskPage::createScene(QMainWindow *parent)
 
 void TaskPage::createToolbar(QMainWindow *parent)
 {
-	taskToolbar_ = parent->addToolBar(tr("&Task toolbar"));
+	if (parent != 0)
+		taskToolbar_ = parent->addToolBar(tr("&Task toolbar"));
 	taskToolbar_->addAction(newTaskAction_);
 	taskToolbar_->addAction(deleteTaskAction_);
 	taskToolbar_->addSeparator();
 	taskToolbar_->setBaseSize(230, 20);
 	taskToolbar_->addAction(deindentTaskAction_);
 	taskToolbar_->addAction(indentTaskAction_);
+	taskToolbar_->show();
 }
 
 
@@ -123,17 +130,14 @@ void TaskPage::createLayout()
 
 	// Create a layout (HBox) to contain table + scene:
 	QHBoxLayout* taskPageLayout = new QHBoxLayout();
-	//layout->addWidget(resourceTable);
 	taskPageLayout->addWidget(taskLeftContent);
 	taskPageLayout->addWidget(taskView_);
 	taskPageLayout->setSpacing(0);
 	taskPageLayout->setMargin(0);
 	taskPageLayout->setContentsMargins(0, 0, 0, 0);
 
-	// Use a widget to set the layout:
-	QWidget* taskPage = new QWidget();
-	taskPage->setLayout(taskPageLayout);
-	taskPage->setContentsMargins(0, 0, 0, 0);
+	setLayout(taskPageLayout);
+	setContentsMargins(0, 0, 0, 0);
 }
 
 

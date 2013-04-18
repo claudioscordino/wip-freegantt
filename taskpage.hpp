@@ -34,7 +34,7 @@ private slots:
 
 private:
 	void createTable();
-	void createScene(QMainWindow *parent);
+	void createScene();
 	void createToolbar(QMainWindow *parent);
 	void createLayout();
 	void createActions();

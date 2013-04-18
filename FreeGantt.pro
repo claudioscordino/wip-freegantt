@@ -6,7 +6,6 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
-INCLUDEPATH += /opt/boost/include
 
 # Input
 HEADERS += allocation.hpp \

@@ -14,7 +14,6 @@
 #include "project.hpp"
 #include "options.hpp"
 #include "taskpage.hpp"
-#include <boost/scoped_ptr.hpp>
 
 
 namespace Ui {
@@ -73,7 +72,7 @@ private:
 	QTableWidget* resourceTable_;
 	Options options_;
 
-	TaskPage* taskPage_;
+	QScopedPointer<TaskPage> taskPage_;
 
 	Ui::MainWindow *ui;
 
