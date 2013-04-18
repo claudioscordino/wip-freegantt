@@ -24,21 +24,21 @@ ResourcePage::ResourcePage(Project* project, QMainWindow *parent) :
 
 void ResourcePage::createActions()
 {
-	newItemAction_ = new QAction(tr("&New Task"), this);
-	newItemAction_->setIcon(QIcon(":images/add.png"));
-	newItemAction_->setStatusTip(tr("Add a new task"));
+	newItemAction_ = new QAction(tr("&New Resource"), this);
+	newItemAction_->setIcon(QIcon(":images/im-user.png"));
+	newItemAction_->setStatusTip(tr("Add a new resource/group"));
 
-	deleteItemAction_ = new QAction(tr("&Delete Task"), this);
-	deleteItemAction_->setIcon(QIcon(":images/list-remove.svg"));
-	deleteItemAction_->setStatusTip(tr("Delete the selected task"));
+	deleteItemAction_ = new QAction(tr("&Delete resource "), this);
+	deleteItemAction_->setIcon(QIcon(":images/im-kick-user.png"));
+	deleteItemAction_->setStatusTip(tr("Delete the selected resource/group"));
 
-	indentItemAction_ = new QAction(tr("&Indent Task"), this);
+	indentItemAction_ = new QAction(tr("&Group Resource"), this);
 	indentItemAction_->setIcon(QIcon(":images/go-next.png"));
-	indentItemAction_->setStatusTip(tr("Indent the selected task"));
+	indentItemAction_->setStatusTip(tr("Group resources"));
 
-	deindentItemAction_ = new QAction(tr("&Deindent Task"), this);
+	deindentItemAction_= new QAction(tr("&Ungroup Resource"), this);
 	deindentItemAction_->setIcon(QIcon(":images/go-previous.png"));
-	deindentItemAction_->setStatusTip(tr("Deindent the selected task"));
+	deindentItemAction_->setStatusTip(tr("Ungroup resources"));
 
 	// Resources:
 	connect(newItemAction_, SIGNAL(triggered()), this, SLOT(newItem()));
@@ -78,7 +78,7 @@ void ResourcePage::createScene()
 	QGraphicsRectItem *rect = new QGraphicsRectItem();
 	rect->setRect(0, 0, 100, 10);
 	resourceScene->addItem(rect);
-	QGraphicsView* view_ = new QGraphicsView(resourceScene);
+	view_ = new QGraphicsView(resourceScene);
 	view_->show();
 }
 
