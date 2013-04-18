@@ -22,7 +22,6 @@
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
-	project_(0),
 	resourceTable_(0),
 	options_(this),
 	taskPage_(0),
@@ -230,7 +229,7 @@ void MainWindow::createMainMenu()
 
 void MainWindow::enableDisableMenu()
 {
-	if (project_ != 0) {
+	if (!project_.isNull()) {
 		editMenu_->setEnabled(true);
 		viewMenu_->setEnabled(true);
 		saveProjectAction_->setEnabled(true);
@@ -269,7 +268,7 @@ void MainWindow::openProject()
 
 bool MainWindow::saveProject()
 {
-	if (project_ == 0)
+	if (project_.isNull())
 		return false;
 
 	if (project_->getFileName() == "")
@@ -280,7 +279,7 @@ bool MainWindow::saveProject()
 
 bool MainWindow::saveProjectAs()
 {
-	if (project_ == 0)
+	if (project_.isNull())
 		return false;
 
 	QString file_name = QFileDialog::getSaveFileName(this,
@@ -299,10 +298,10 @@ void MainWindow::newProject()
 		saveProject();
 		delete mainTab_;
 	case 2:
-		if (project_ == 0)
+		if (project_.isNull())
 			std::cerr << "1. Project == 0" << std::endl;
-		project_ = new Project("Untitled");
-		if (project_ == 0)
+		project_.reset(new Project("Untitled"));
+		if (project_.isNull())
 			std::cerr << "2. Project == 0" << std::endl;
 
 
@@ -331,7 +330,7 @@ void MainWindow::newProject()
 // 2 = project non existing
 int MainWindow::okToDiscardCurrentProject()
 {
-	if (project_ != 0) {
+	if (!project_.isNull()) {
 		int ret = QMessageBox::warning(this, tr("Exit"),
 					       tr("The project has been modifed.\n"
 						  "Do you want to save your changes ?"),
@@ -375,7 +374,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::createTaskTab()
 {
-	taskPage_ = new TaskPage(project_, this);
+	taskPage_ = new TaskPage(project_.data(), this);
 
 	// Tasks:
 	connect(newTaskAction_, SIGNAL(triggered()), taskPage_, SLOT(newTaskSlot()));

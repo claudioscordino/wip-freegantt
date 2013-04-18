@@ -14,6 +14,7 @@
 #include "project.hpp"
 #include "options.hpp"
 #include "taskpage.hpp"
+#include <boost/scoped_ptr.hpp>
 
 
 namespace Ui {
@@ -67,7 +68,7 @@ private:
 	void writeInStatusBar(const char* s, int msec);
 
 
-	Project* project_;
+	QScopedPointer<Project> project_;
 
 	QTableWidget* resourceTable_;
 	Options options_;
