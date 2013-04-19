@@ -54,7 +54,8 @@ void ResourcePage::createTable()
 	table_ = new QTableWidget(0, 3);
 	table_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	table_->setColumnHidden(0, true);
-	connect(table_, SIGNAL(cellChanged(int, int)), this, SLOT(resourceValueChanged(int, int)));
+	connect(table_, SIGNAL(cellChanged(int, int)), this, SLOT(valueChanged(int, int)));
+
 	QStringList labels;
 	labels.append("Id");
 	labels.append("Name/Group");
