@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	enableDisableMenu();
 
 	setWindowIcon(QIcon(":/images/gantt-hi.png"));
-	printWindowTitle();
+	updateWindowTitle();
 	options_.setHidden(true);
 	setWindowModified(false);
 }
@@ -71,10 +71,13 @@ void MainWindow::createActions()
 	saveAsProjectAction_->setStatusTip(tr("Save the current project with a new name"));
 	connect(saveAsProjectAction_, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 
-	recentProjectsAction_ = new QAction(tr("&Open recent projects"), this);
-	recentProjectsAction_->setIcon(QIcon(":images/document-open-recent.png"));
-	recentProjectsAction_->setStatusTip(tr("Open a recent project"));
-
+	for (int i = 0; i < maxRecentFiles; ++i){
+		recentFilesActions_[i] = new QAction(this);
+		recentFilesActions_[i]->setVisible(false);
+		recentFilesActions_[i]->setIcon(QIcon(":images/document-open-recent.png"));
+		recentFilesActions_[i]->setStatusTip(tr("Open a recent project"));
+		connect(recentFilesActions_[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
+	}
 	exportProjectAction_ = new QAction(tr("&Export project"), this);
 	exportProjectAction_->setIcon(QIcon(":images/document-save.svg"));
 	exportProjectAction_->setStatusTip(tr("Export the current project"));
@@ -183,7 +186,6 @@ void MainWindow::createMainMenu()
 	fileMenu_ = menuBar()->addMenu((tr("&File")));
 	fileMenu_->addAction(newProjectAction_);
 	fileMenu_->addAction(openProjectAction_);
-	fileMenu_->addAction(recentProjectsAction_);
 	fileMenu_->addAction(saveProjectAction_);
 	fileMenu_->addAction(saveAsProjectAction_);
 	fileMenu_->addAction(exportProjectAction_);
@@ -256,7 +258,6 @@ void MainWindow::openProject()
 			setWindowModified(false);
 		}
 	}
-
 }
 
 bool MainWindow::saveProject()
@@ -281,10 +282,11 @@ bool MainWindow::saveProjectAs()
 	if (file_name.isEmpty())
 		return false;
 	project_->setFileName(file_name.toStdString());
+	updateWindowTitle();
 	return project_->save();
 }
 
-void MainWindow::printWindowTitle()
+void MainWindow::updateWindowTitle()
 {
 	if (project_ == 0)
 		setWindowTitle("FreeGantt " VERSION);
@@ -292,8 +294,60 @@ void MainWindow::printWindowTitle()
 		setWindowTitle("FreeGantt " + QString(VERSION) + " - Untitled [*]");
 	else
 		setWindowTitle("FreeGantt " + QString(VERSION) + " - " +
-		     QFileInfo(QString(project_->getFileName().c_str())).fileName() +
+		     strippedFileName(QString(project_->getFileName().c_str())) +
 		     "[*]");
+}
+
+void MainWindow::addToRecentFiles(const QString& filename)
+{
+	QString shownName = tr("Untitled");
+	if (!filename.isEmpty()){
+		shownName = strippedFileName(filename);
+		recentFiles_.removeAll(filename);
+		recentFiles_.prepend(filename);
+		updateRecentFileActions();
+	}
+}
+
+void MainWindow::updateRecentFileActions()
+{
+	QMutableStringListIterator i(recentFiles_);
+	while (i.hasNext()){
+		if (!QFile::exists(i.next()))
+			i.remove();
+	}
+
+	for (int j = 0; j < maxRecentFiles; ++j){
+		if (j < recentFiles_.count()){
+			QString text = tr("&%1 %2")
+					.arg(j + 1)
+					.arg(strippedFileName(recentFiles_[j]));
+			recentFilesActions_[j]->setText(text);
+			recentFilesActions_[j]->setData(recentFiles_[j]);
+			recentFilesActions_[j]->setVisible(true);
+		} else {
+			recentFilesActions_[j]->setVisible(false);
+		}
+	}
+	separatorAction_->setVisible(!recentFiles_.isEmpty());
+}
+
+
+QString MainWindow::strippedFileName(const QString &fullFileName)
+{
+	return QFileInfo(fullFileName).fileName();
+}
+
+void MainWindow::openRecentFile()
+{
+	if (okToDiscardCurrentProject() > 0) {
+		QAction* action = qobject_cast<QAction*> (sender());
+		if (action){
+			project_->load(action->data().toString().toStdString());
+			updateWindowTitle();
+			setWindowModified(false);
+		}
+	}
 }
 
 
@@ -319,7 +373,7 @@ void MainWindow::newProject()
 
 		enableDisableMenu();
 
-		printWindowTitle();
+		updateWindowTitle();
 		statusBar()->showMessage(tr("Project created."), 2000);
 		setWindowModified(false);
 	}
@@ -370,7 +424,6 @@ MainWindow::~MainWindow()
 void MainWindow::updateOptions()
 {
 	taskPage_->setFirstDayOfWeek(options_.getFirstDayOfWeek());
-
 }
 
 // ==============================================

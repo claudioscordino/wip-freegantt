@@ -20,6 +20,9 @@ namespace Ui {
 class MainWindow;
 }
 
+const int maxRecentFiles = 5;
+
+
 class MainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -39,6 +42,7 @@ protected:
 	}
 
 private slots:
+	void openRecentFile();
 	int okToDiscardCurrentProject();
 	void exitProgram();
 	void newProject();
@@ -54,7 +58,10 @@ private slots:
 	void showOptions();
 
 private:
-	void printWindowTitle();
+	void updateRecentFileActions();
+	QString strippedFileName(const QString &fullFileName);
+	void addToRecentFiles(const QString& filename);
+	void updateWindowTitle();
 	void createActions();
 	void createMainMenu();
 	void createMainToolbar();
@@ -80,13 +87,16 @@ private:
 	QAction* newProjectAction_;
 	QAction* printProjectAction_;
 	QAction* openProjectAction_;
-	QAction* recentProjectsAction_;
+
 	QAction* saveProjectAction_;
 	QAction* saveAsProjectAction_;
 	QAction* exportProjectAction_;
 	QAction* exitAction_;
 	QAction* optionsPanelAction_;
 	QAction* switchTabAction_;
+
+	QAction* recentFilesActions_[maxRecentFiles];
+	QAction* separatorAction_;
 
 	QAction* indentTaskAction_;
 	QAction* deindentTaskAction_;
@@ -115,6 +125,12 @@ private:
 
 	QToolBar* mainToolbar_;
 	QTabWidget* mainTab_;
+
+	// Recent files:
+	QStringList recentFiles_;
+
+
+
 };
 
 #endif // MAINWINDOW_HPP
