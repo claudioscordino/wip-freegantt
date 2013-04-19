@@ -357,7 +357,11 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
+void MainWindow::updateOptions()
+{
+	taskPage_->setFirstDayOfWeek(options_.getFirstDayOfWeek());
 
+}
 
 // ==============================================
 //		TASKS

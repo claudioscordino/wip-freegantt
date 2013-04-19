@@ -29,6 +29,9 @@ public:
 	void refreshResourceTable();
 	~MainWindow();
 
+public slots:
+	void updateOptions();
+
 
 protected:
 	inline void closeEvent(QCloseEvent* ){

@@ -20,6 +20,7 @@ TaskPage::TaskPage(Project* project, QMainWindow *parent) :
 	calendarTaskId_(0)
 {
 	calendar_.setHidden(true);
+	calendar_.setFirstDayOfWeek(Qt::DayOfWeek(1));
 	createPage();
 }
 

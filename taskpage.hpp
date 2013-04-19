@@ -16,6 +16,9 @@ class TaskPage : public Page
 public:
 	explicit TaskPage(Project* project, QMainWindow *parent = 0);
 	virtual void refreshTable();
+	void setFirstDayOfWeek(Qt::DayOfWeek day){
+		calendar_.setFirstDayOfWeek(day);
+	}
 
 public slots:
 	virtual void newItem();
@@ -31,7 +34,6 @@ private slots:
 	void changeTaskBegin();
 
 private:
-
 	virtual void createTable();
 	virtual void createScene();
 	virtual void createToolbar();
