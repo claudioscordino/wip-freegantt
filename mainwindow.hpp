@@ -128,9 +128,6 @@ private:
 
 	// Recent files:
 	QStringList recentFiles_;
-
-
-
 };
 
 #endif // MAINWINDOW_HPP

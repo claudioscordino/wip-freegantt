@@ -78,6 +78,7 @@ void MainWindow::createActions()
 		recentFilesActions_[i]->setStatusTip(tr("Open a recent project"));
 		connect(recentFilesActions_[i], SIGNAL(triggered()), this, SLOT(openRecentFile()));
 	}
+
 	exportProjectAction_ = new QAction(tr("&Export project"), this);
 	exportProjectAction_->setIcon(QIcon(":images/document-save.svg"));
 	exportProjectAction_->setStatusTip(tr("Export the current project"));
@@ -188,6 +189,13 @@ void MainWindow::createMainMenu()
 	fileMenu_->addAction(openProjectAction_);
 	fileMenu_->addAction(saveProjectAction_);
 	fileMenu_->addAction(saveAsProjectAction_);
+
+	// Recent files:
+	separatorAction_ = fileMenu_->addSeparator();
+	for (int i = 0; i < maxRecentFiles; ++i)
+		fileMenu_->addAction(recentFilesActions_[i]);
+	fileMenu_->addSeparator();
+
 	fileMenu_->addAction(exportProjectAction_);
 	fileMenu_->addAction(printProjectAction_);
 	fileMenu_->addSeparator();
@@ -255,6 +263,8 @@ void MainWindow::openProject()
 								tr("FreeGantt files (*.fgt)"));
 		if (!fileName.isEmpty()){
 			project_->load(fileName.toStdString());
+			addToRecentFiles(fileName);
+			updateWindowTitle();
 			setWindowModified(false);
 		}
 	}
@@ -276,14 +286,19 @@ bool MainWindow::saveProjectAs()
 	if (project_.isNull())
 		return false;
 
-	QString file_name = QFileDialog::getSaveFileName(this,
+	QString fileName = QFileDialog::getSaveFileName(this,
 							 tr ("Save project as"), ".",
 							 tr ("FreeGantt files (*.fgt)"));
-	if (file_name.isEmpty())
+	if (fileName.isEmpty())
 		return false;
-	project_->setFileName(file_name.toStdString());
-	updateWindowTitle();
-	return project_->save();
+
+	if (project_->save()){
+		project_->setFileName(fileName.toStdString());
+		addToRecentFiles(fileName);
+		updateWindowTitle();
+		setWindowModified(false);
+	}
+	return true;
 }
 
 void MainWindow::updateWindowTitle()
@@ -291,20 +306,21 @@ void MainWindow::updateWindowTitle()
 	if (project_ == 0)
 		setWindowTitle("FreeGantt " VERSION);
 	else if (project_->getFileName() == "")
-		setWindowTitle("FreeGantt " + QString(VERSION) + " - Untitled [*]");
+		setWindowTitle("FreeGantt - Untitled [*]");
 	else
-		setWindowTitle("FreeGantt " + QString(VERSION) + " - " +
+		setWindowTitle("FreeGantt - " +
 		     strippedFileName(QString(project_->getFileName().c_str())) +
-		     "[*]");
+		     " [*]");
 }
 
 void MainWindow::addToRecentFiles(const QString& filename)
 {
-	QString shownName = tr("Untitled");
 	if (!filename.isEmpty()){
-		shownName = strippedFileName(filename);
+		std::cerr << "Fase 2" << std::endl;
 		recentFiles_.removeAll(filename);
+		std::cerr << "Fase 3" << std::endl;
 		recentFiles_.prepend(filename);
+		std::cerr << "Fase 4" << std::endl;
 		updateRecentFileActions();
 	}
 }
