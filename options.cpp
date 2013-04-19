@@ -16,6 +16,7 @@ Options::Options(MainWindow* parent):
 
 	QVBoxLayout* leftLayout = new QVBoxLayout;
 
+	QHBoxLayout* weekDayLayout = new QHBoxLayout;
 	firstDayOfWeek_ = new QComboBox;
 	firstDayOfWeek_->addItem(tr("Monday"), Qt::Monday);
 	firstDayOfWeek_->addItem(tr("Tuesday"), Qt::Tuesday);
@@ -24,21 +25,20 @@ Options::Options(MainWindow* parent):
 	firstDayOfWeek_->addItem(tr("Friday"), Qt::Friday);
 	firstDayOfWeek_->addItem(tr("Saturday"), Qt::Saturday);
 	firstDayOfWeek_->addItem(tr("Sunday"), Qt::Sunday);
-
 	firstDayOfWeek_->setCurrentIndex(0);
 
-	firstDayLabel_ = new QLabel(tr("Wee&k starts on:"));
-	firstDayLabel_->setBuddy(firstDayOfWeek_);
+	QLabel* firstDayLabel = new QLabel(tr("Wee&k starts on:"));
+	firstDayLabel->setBuddy(firstDayOfWeek_);
 
-	leftLayout->addWidget(firstDayOfWeek_);
-	leftLayout->addWidget(firstDayLabel_);
+	weekDayLayout->addWidget(firstDayLabel);
+	weekDayLayout->addWidget(firstDayOfWeek_);
+	leftLayout->addLayout(weekDayLayout);
 
-
-	closeButton_ = new QPushButton(tr("Ok"), this);
-	connect(closeButton_, SIGNAL(clicked()), this, SLOT(closePanel()));
+	QPushButton* closeButton = new QPushButton(tr("Ok"), this);
+	connect(closeButton, SIGNAL(clicked()), this, SLOT(closePanel()));
 	QVBoxLayout* rightLayout = new QVBoxLayout;
 	rightLayout->addStretch();
-	rightLayout->addWidget(closeButton_);
+	rightLayout->addWidget(closeButton);
 
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	mainLayout->addLayout(leftLayout);

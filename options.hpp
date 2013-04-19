@@ -21,7 +21,6 @@ public:
 	Options(MainWindow* parent = 0);
 
 	Qt::DayOfWeek getFirstDayOfWeek(){
-		std::cerr << "Current index: " << firstDayOfWeek_->currentIndex() << std::endl;
 		return Qt::DayOfWeek(1+firstDayOfWeek_->currentIndex());
 	}
 
@@ -30,8 +29,6 @@ private slots:
 
 private:
 	QComboBox* firstDayOfWeek_;
-	QLabel* firstDayLabel_;
-	QPushButton* closeButton_ ;
 	MainWindow* parent_;
 
 };

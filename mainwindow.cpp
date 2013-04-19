@@ -189,8 +189,6 @@ void MainWindow::createMainMenu()
 	fileMenu_->addAction(exportProjectAction_);
 	fileMenu_->addAction(printProjectAction_);
 	fileMenu_->addSeparator();
-	fileMenu_->addAction(optionsPanelAction_);
-	fileMenu_->addSeparator();
 	fileMenu_->addAction(exitAction_);
 
 	// Edit menu:
@@ -209,6 +207,8 @@ void MainWindow::createMainMenu()
 	viewMenu_ = menuBar()->addMenu((tr("&View")));
 	viewMenu_->addAction(viewTaskAction_);
 	viewMenu_->addAction(viewResourceAction_);
+	viewMenu_->addSeparator();
+	viewMenu_->addAction(optionsPanelAction_);
 
 	menuBar()->addSeparator();
 
