@@ -351,7 +351,7 @@ void MainWindow::updateRecentFileActions()
 
 QString MainWindow::strippedFileName(const QString &fullFileName)
 {
-	return QFileInfo(fullFileName).fileName();
+	return QFileInfo(fullFileName).baseName();
 }
 
 void MainWindow::openRecentFile()
