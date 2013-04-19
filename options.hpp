@@ -2,10 +2,13 @@
 #define OPTIONS_HPP
 
 #include <QDialog>
-#include <QCheckBox>
+#include <QComboBox>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QLabel>
+#include <iostream>
+
 
 class MainWindow;
 
@@ -18,17 +21,16 @@ public:
 	Options(MainWindow* parent = 0);
 
 	Qt::DayOfWeek getFirstDayOfWeek(){
-		if (firstDaySundayCheckBox_->isChecked())
-			return Qt::DayOfWeek(7);
-		else
-			return Qt::DayOfWeek(1);
+		std::cerr << "Current index: " << firstDayOfWeek_->currentIndex() << std::endl;
+		return Qt::DayOfWeek(1+firstDayOfWeek_->currentIndex());
 	}
 
 private slots:
 	void closePanel();
 
 private:
-	QCheckBox* firstDaySundayCheckBox_;
+	QComboBox* firstDayOfWeek_;
+	QLabel* firstDayLabel_;
 	QPushButton* closeButton_ ;
 	MainWindow* parent_;
 

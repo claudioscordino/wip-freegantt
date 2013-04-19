@@ -15,8 +15,24 @@ Options::Options(MainWindow* parent):
 	setFixedWidth(400);
 
 	QVBoxLayout* leftLayout = new QVBoxLayout;
-	firstDaySundayCheckBox_ = new QCheckBox(tr("First day of week is Sunday"), this);
-	leftLayout->addWidget(firstDaySundayCheckBox_);
+
+	firstDayOfWeek_ = new QComboBox;
+	firstDayOfWeek_->addItem(tr("Monday"), Qt::Monday);
+	firstDayOfWeek_->addItem(tr("Tuesday"), Qt::Tuesday);
+	firstDayOfWeek_->addItem(tr("Wednesday"), Qt::Wednesday);
+	firstDayOfWeek_->addItem(tr("Thursday"), Qt::Thursday);
+	firstDayOfWeek_->addItem(tr("Friday"), Qt::Friday);
+	firstDayOfWeek_->addItem(tr("Saturday"), Qt::Saturday);
+	firstDayOfWeek_->addItem(tr("Sunday"), Qt::Sunday);
+
+	firstDayOfWeek_->setCurrentIndex(0);
+
+	firstDayLabel_ = new QLabel(tr("Wee&k starts on:"));
+	firstDayLabel_->setBuddy(firstDayOfWeek_);
+
+	leftLayout->addWidget(firstDayOfWeek_);
+	leftLayout->addWidget(firstDayLabel_);
+
 
 	closeButton_ = new QPushButton(tr("Ok"), this);
 	connect(closeButton_, SIGNAL(clicked()), this, SLOT(closePanel()));
