@@ -54,6 +54,7 @@ private slots:
 	void showOptions();
 
 private:
+	void printWindowTitle();
 	void createActions();
 	void createMainMenu();
 	void createMainToolbar();

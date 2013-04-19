@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	enableDisableMenu();
 
 	setWindowIcon(QIcon(":/images/gantt-hi.png"));
-	setWindowTitle("FreeGantt " VERSION);
+	printWindowTitle();
 	options_.setHidden(true);
 	setWindowModified(false);
 }
@@ -284,6 +284,19 @@ bool MainWindow::saveProjectAs()
 	return project_->save();
 }
 
+void MainWindow::printWindowTitle()
+{
+	if (project_ == 0)
+		setWindowTitle("FreeGantt " VERSION);
+	else if (project_->getFileName() == "")
+		setWindowTitle("FreeGantt " + QString(VERSION) + " - Untitled [*]");
+	else
+		setWindowTitle("FreeGantt " + QString(VERSION) + " - " +
+		     QFileInfo(QString(project_->getFileName().c_str())).fileName() +
+		     "[*]");
+}
+
+
 void MainWindow::newProject()
 {
 	switch (okToDiscardCurrentProject()){
@@ -293,7 +306,7 @@ void MainWindow::newProject()
 	case 2:
 		if (project_.isNull())
 			std::cerr << "1. Project == 0" << std::endl;
-		project_.reset(new Project("Untitled"));
+		project_.reset(new Project());
 		if (project_.isNull())
 			std::cerr << "2. Project == 0" << std::endl;
 
@@ -306,10 +319,7 @@ void MainWindow::newProject()
 
 		enableDisableMenu();
 
-		std::cerr << "Project name: " << project_->getName() << std::endl;
-		std::cerr << "Bye" << std::endl;
-
-		setWindowTitle("FreeGantt " + QString(VERSION) + " - " + QString(project_->getName().c_str()) + " [*]");
+		printWindowTitle();
 		statusBar()->showMessage(tr("Project created."), 2000);
 		setWindowModified(false);
 	}

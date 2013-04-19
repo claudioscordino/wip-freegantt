@@ -11,8 +11,7 @@ class Project
 {
 public:
 
-	Project(const std::string& name):
-	    project_name_(name),
+	Project():
 	    file_name_("")
 		{}
 	~Project(){}
@@ -181,7 +180,6 @@ public:
 
 	inline bool load(const std::string& file){
 		file_name_ = file;
-		project_name_ = file;
 		// TODO: load file
 		return true;
 	}
@@ -189,10 +187,6 @@ public:
 	inline bool save(){
 		// TODO: save to file
 		return true;
-	}
-
-	inline std::string getName() {
-		return project_name_;
 	}
 
 	inline std::string getFileName() {
@@ -236,9 +230,6 @@ private:
 
 	/// List of holidays:
 	Calendar holidays_;
-
-	/// Project name:
-	std::string project_name_;
 
 	/// Path of the project file name:
 	std::string file_name_;
