@@ -20,6 +20,7 @@ TaskPage::TaskPage(Project* project, QMainWindow *parent) :
 	calendarTaskId_(0)
 {
 	calendar_.setHidden(true);
+	connect (&calendar_, SIGNAL(selectionChanged()), this, SLOT(changeTaskBegin()));
 	calendar_.setFirstDayOfWeek(Qt::DayOfWeek(1));
 	createPage();
 }
@@ -247,13 +248,16 @@ void TaskPage::valueClicked(int row, int column)
 	if (row < 0 || row > table_->rowCount())
 		return;
 
-	if ((column == 2) && (calendar_.isHidden() == true)){
+	if (column == 2) {
+		// Show calendar:
 		int id = table_->item(row, 0)->text().toInt();
 		calendarTaskId_ = id;
 		calendar_.setSelectedDate(project_->getTaskFromId(id)->getBegin());
 		calendar_.setWindowTitle(QString("Select begin date"));
+		calendar_.show();
+		calendar_.raise();
+		calendar_.activateWindow();
 		calendar_.setHidden(false);
-		connect (&calendar_, SIGNAL(selectionChanged()), this, SLOT(changeTaskBegin()));
 	}
 }
 
