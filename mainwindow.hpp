@@ -76,7 +76,7 @@ private:
 
 	QScopedPointer<Project> project_;
 
-	QTableWidget* resourceTable_;
+	//QTableWidget* resourceTable_;
 	Options options_;
 
 	QScopedPointer<TaskPage> taskPage_;

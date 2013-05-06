@@ -24,7 +24,6 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	project_(0),
-	resourceTable_(0),
 	options_(this),
 	taskPage_(0),
 	ui(new Ui::MainWindow),
