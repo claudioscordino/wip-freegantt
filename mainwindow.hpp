@@ -58,6 +58,8 @@ private slots:
 	void showOptions();
 
 private:
+	void saveSettings();
+	void loadSettings();
 	void updateRecentFileActions();
 	QString strippedFileName(const QString &fullFileName);
 	void addToRecentFiles(const QString& filename);

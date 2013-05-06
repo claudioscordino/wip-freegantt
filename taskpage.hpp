@@ -19,6 +19,9 @@ public:
 	void setFirstDayOfWeek(Qt::DayOfWeek day){
 		calendar_.setFirstDayOfWeek(day);
 	}
+	Qt::DayOfWeek getFirstDayOfWeek(){
+		return calendar_.firstDayOfWeek();
+	}
 
 public slots:
 	virtual void newItem();

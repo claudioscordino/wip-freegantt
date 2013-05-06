@@ -11,6 +11,7 @@
 #include <QGraphicsView>
 #include <QGraphicsLineItem>
 #include <QGraphicsRectItem>
+#include <QSettings>
 #include <iostream>
 
 #define VERSION "0.3"
@@ -40,6 +41,21 @@ MainWindow::MainWindow(QWidget *parent) :
 	updateWindowTitle();
 	options_.setHidden(true);
 	setWindowModified(false);
+	loadSettings();
+}
+
+void MainWindow::loadSettings()
+{
+	QSettings settings ("Claudio Scordino", "Freegantt");
+	recentFiles_ = settings.value("recentFiles").toStringList();
+	restoreGeometry((settings.value("geometry").toByteArray()));
+}
+
+void MainWindow::saveSettings()
+{
+	QSettings settings ("Claudio Scordino", "Freegantt");
+	settings.setValue("recentFiles", recentFiles_);
+	settings.setValue("geometry", saveGeometry());
 }
 
 
@@ -417,8 +433,10 @@ int MainWindow::okToDiscardCurrentProject()
 
 void MainWindow::exitProgram()
 {
-	if (okToDiscardCurrentProject() != 0)
+	if (okToDiscardCurrentProject() != 0){
+		saveSettings();
 		exit(1);
+	}
 }
 
 
