@@ -1,15 +1,8 @@
 #include "options.hpp"
 #include "mainwindow.hpp"
 
-void Options::closePanel()
-{
-	parent_->updateOptions();
-	this->setVisible(false);
-}
-
 Options::Options(MainWindow* parent):
-    QDialog(parent),
-    parent_(parent){
+    QDialog(parent){
 	setWindowTitle(tr("Options"));
 	setFixedHeight(150);
 	setFixedWidth(400);
@@ -33,6 +26,9 @@ Options::Options(MainWindow* parent):
 	weekDayLayout->addWidget(firstDayLabel);
 	weekDayLayout->addWidget(firstDayOfWeek_);
 	leftLayout->addLayout(weekDayLayout);
+
+	showGrid_ = new QCheckBox(tr("Show &Grid"));
+	leftLayout->addWidget(showGrid_);
 
 	QPushButton* closeButton = new QPushButton(tr("Ok"), this);
 	connect(closeButton, SIGNAL(clicked()), this, SLOT(closePanel()));

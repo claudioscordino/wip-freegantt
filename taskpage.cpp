@@ -68,6 +68,8 @@ void TaskPage::createTable()
 	table_->verticalHeader()->setVisible(false);
 	table_->setMinimumWidth(230);
 	table_->setMaximumWidth(230);
+
+	// Only select rows:
 	table_->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	// Set width of the three columns:

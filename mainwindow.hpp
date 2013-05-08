@@ -32,8 +32,6 @@ public:
 	void refreshResourceTable();
 	~MainWindow();
 
-public slots:
-	void updateOptions();
 
 
 protected:
@@ -54,8 +52,7 @@ private slots:
 	void switchTab();
 	void switchToTaskTab();
 	void switchToResourceTab();
-
-	void showOptions();
+	void setOptions();
 
 private:
 	void saveSettings();
@@ -76,8 +73,7 @@ private:
 
 	QScopedPointer<Project> project_;
 
-	//QTableWidget* resourceTable_;
-	Options options_;
+	int pippo;
 
 	QScopedPointer<TaskPage> taskPage_;
 	QScopedPointer<ResourcePage> resourcePage_;

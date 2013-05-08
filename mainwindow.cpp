@@ -24,7 +24,6 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	project_(0),
-	options_(this),
 	taskPage_(0),
 	ui(new Ui::MainWindow),
 	mainToolbar_(0),
@@ -38,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	setWindowIcon(QIcon(":/images/gantt-hi.png"));
 	updateWindowTitle();
-	options_.setHidden(true);
 	setWindowModified(false);
 	loadSettings();
 }
@@ -107,7 +105,7 @@ void MainWindow::createActions()
 	optionsPanelAction_->setShortcut(QKeySequence::Close);
 	optionsPanelAction_->setIcon(QIcon(":images/preferences-desktop.svg"));
 	optionsPanelAction_->setStatusTip(tr("Set options"));
-	connect(optionsPanelAction_, SIGNAL(triggered()), this, SLOT(showOptions()));
+	connect(optionsPanelAction_, SIGNAL(triggered()), this, SLOT(setOptions()));
 
 	exitAction_ = new QAction(tr("&Exit"), this);
 	exitAction_->setIcon(QIcon(":images/exit.svg"));
@@ -173,9 +171,12 @@ void MainWindow::createActions()
 }
 
 
-void MainWindow::showOptions()
+void MainWindow::setOptions()
 {
-	options_.setVisible(true);
+	Options options (this);
+	if (options.exec()){
+		pippo = 1;
+	}
 }
 
 // 0 = Tasks; 1 = Resources
@@ -227,13 +228,14 @@ void MainWindow::createMainMenu()
 	editMenu_->addAction(deleteResourceAction_);
 	editMenu_->addAction(indentResourceAction_);
 	editMenu_->addAction(deindentResourceAction_);
+	editMenu_->addSeparator();
+	editMenu_->addAction(optionsPanelAction_);
 
 	// View menu:
 	viewMenu_ = menuBar()->addMenu((tr("&View")));
 	viewMenu_->addAction(viewTaskAction_);
 	viewMenu_->addAction(viewResourceAction_);
-	viewMenu_->addSeparator();
-	viewMenu_->addAction(optionsPanelAction_);
+
 
 	menuBar()->addSeparator();
 
@@ -247,18 +249,27 @@ void MainWindow::createMainMenu()
 
 void MainWindow::enableDisableMenu()
 {
-	if (!project_.isNull()) {
-		editMenu_->setEnabled(true);
-		viewMenu_->setEnabled(true);
-		saveProjectAction_->setEnabled(true);
-		saveAsProjectAction_->setEnabled(true);
-		exportProjectAction_->setEnabled(true);
-	} else {
-		editMenu_->setEnabled(false);
+	if (project_.isNull()) {
+		// Edit menu:
+		newTaskAction_->setEnabled(false);
+		deleteTaskAction_->setEnabled(false);
+		indentTaskAction_->setEnabled(false);
+		deindentTaskAction_->setEnabled(false);
+		newResourceAction_->setEnabled(false);
+		deleteResourceAction_->setEnabled(false);
+		indentResourceAction_->setEnabled(false);
+		deindentResourceAction_->setEnabled(false);
+
 		viewMenu_->setEnabled(false);
 		saveProjectAction_->setEnabled(false);
 		saveAsProjectAction_->setEnabled(false);
 		exportProjectAction_->setEnabled(false);
+
+	} else {
+		viewMenu_->setEnabled(true);
+		saveProjectAction_->setEnabled(true);
+		saveAsProjectAction_->setEnabled(true);
+		exportProjectAction_->setEnabled(true);
 	}
 }
 
@@ -454,10 +465,6 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
-void MainWindow::updateOptions()
-{
-	taskPage_->setFirstDayOfWeek(options_.getFirstDayOfWeek());
-}
 
 // ==============================================
 //		TASKS
