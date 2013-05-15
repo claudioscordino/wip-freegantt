@@ -23,6 +23,7 @@
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
+	options_(this),
 	project_(0),
 	taskPage_(0),
 	ui(new Ui::MainWindow),
@@ -46,6 +47,8 @@ void MainWindow::loadSettings()
 	QSettings settings ("Claudio Scordino", "Freegantt");
 	recentFiles_ = settings.value("recentFiles").toStringList();
 	restoreGeometry((settings.value("geometry").toByteArray()));
+	options_.setShowGrid(settings.value("showgrid").toBool());
+	options_.setFirstDayOfWeek(Qt::DayOfWeek(settings.value("firstdayofweek").toInt()));
 }
 
 void MainWindow::saveSettings()
@@ -53,6 +56,8 @@ void MainWindow::saveSettings()
 	QSettings settings ("Claudio Scordino", "Freegantt");
 	settings.setValue("recentFiles", recentFiles_);
 	settings.setValue("geometry", saveGeometry());
+	settings.setValue("showgrid", options_.getShowGrid());
+	settings.setValue("firstdayofweek", options_.getFirstDayOfWeek());
 }
 
 
@@ -173,9 +178,15 @@ void MainWindow::createActions()
 
 void MainWindow::setOptions()
 {
-	Options options (this);
-	if (options.exec()){
-		pippo = 1;
+
+	if (options_.exec()){
+		if (!taskPage_.isNull()){
+			taskPage_->showGrid(options_.getShowGrid());
+			taskPage_->setFirstDayOfWeek(options_.getFirstDayOfWeek());
+		if (!resourcePage_.isNull())
+			resourcePage_->showGrid(options_.getShowGrid());
+		}
+		std::cerr << "Options updated" << std::endl;
 	}
 }
 
@@ -481,6 +492,10 @@ void MainWindow::createTaskTab()
 	connect(indentTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(indentItem()));
 	connect(deindentTaskAction_, SIGNAL(triggered()), taskPage_.data(), SLOT(deindentItem()));
 
+	// Options:
+	taskPage_->showGrid(options_.getShowGrid());
+	taskPage_->setFirstDayOfWeek(options_.getFirstDayOfWeek());
+
 	// Add the widget to the tab:
 	mainTab_->addTab(taskPage_.data(), tr("Tasks"));
 	setCentralWidget(mainTab_);
@@ -540,6 +555,9 @@ void MainWindow::createResourceTab()
 	connect(deleteResourceAction_, SIGNAL(triggered()), resourcePage_.data(), SLOT(removeItem()));
 	connect(indentResourceAction_, SIGNAL(triggered()), resourcePage_.data(), SLOT(indentItem()));
 	connect(deindentResourceAction_, SIGNAL(triggered()), resourcePage_.data(), SLOT(deindentItem()));
+
+	// Options:
+	resourcePage_->showGrid(options_.getShowGrid());
 
 	// Add the widget to the tab:
 	mainTab_->addTab(resourcePage_.data(), tr("Resources"));

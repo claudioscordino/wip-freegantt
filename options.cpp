@@ -1,6 +1,7 @@
 #include "options.hpp"
 #include "mainwindow.hpp"
 
+
 Options::Options(MainWindow* parent):
     QDialog(parent){
 	setWindowTitle(tr("Options"));
@@ -10,25 +11,26 @@ Options::Options(MainWindow* parent):
 	QVBoxLayout* leftLayout = new QVBoxLayout;
 
 	QHBoxLayout* weekDayLayout = new QHBoxLayout;
-	firstDayOfWeek_ = new QComboBox;
-	firstDayOfWeek_->addItem(tr("Monday"), Qt::Monday);
-	firstDayOfWeek_->addItem(tr("Tuesday"), Qt::Tuesday);
-	firstDayOfWeek_->addItem(tr("Wednesday"), Qt::Wednesday);
-	firstDayOfWeek_->addItem(tr("Thursday"), Qt::Thursday);
-	firstDayOfWeek_->addItem(tr("Friday"), Qt::Friday);
-	firstDayOfWeek_->addItem(tr("Saturday"), Qt::Saturday);
-	firstDayOfWeek_->addItem(tr("Sunday"), Qt::Sunday);
-	firstDayOfWeek_->setCurrentIndex(0);
+	firstDayBox_ = new QComboBox;
+	firstDayBox_->addItem(tr("Monday"), Qt::Monday);
+	firstDayBox_->addItem(tr("Tuesday"), Qt::Tuesday);
+	firstDayBox_->addItem(tr("Wednesday"), Qt::Wednesday);
+	firstDayBox_->addItem(tr("Thursday"), Qt::Thursday);
+	firstDayBox_->addItem(tr("Friday"), Qt::Friday);
+	firstDayBox_->addItem(tr("Saturday"), Qt::Saturday);
+	firstDayBox_->addItem(tr("Sunday"), Qt::Sunday);
+	firstDayBox_->setCurrentIndex(0);
 
-	QLabel* firstDayLabel = new QLabel(tr("Wee&k starts on:"));
-	firstDayLabel->setBuddy(firstDayOfWeek_);
+	QLabel* firstDayLabel = new QLabel(tr("Week starts on:"));
+	firstDayLabel->setBuddy(firstDayBox_);
 
 	weekDayLayout->addWidget(firstDayLabel);
-	weekDayLayout->addWidget(firstDayOfWeek_);
+	weekDayLayout->addWidget(firstDayBox_);
 	leftLayout->addLayout(weekDayLayout);
 
-	showGrid_ = new QCheckBox(tr("Show &Grid"));
-	leftLayout->addWidget(showGrid_);
+	showGridBox_ = new QCheckBox(tr("Show &Grid"));
+	showGridBox_->setChecked(true);
+	leftLayout->addWidget(showGridBox_);
 
 	QPushButton* closeButton = new QPushButton(tr("Ok"), this);
 	connect(closeButton, SIGNAL(clicked()), this, SLOT(closePanel()));

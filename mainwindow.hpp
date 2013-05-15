@@ -55,6 +55,8 @@ private slots:
 	void setOptions();
 
 private:
+
+	Options options_;
 	void saveSettings();
 	void loadSettings();
 	void updateRecentFileActions();
@@ -72,8 +74,6 @@ private:
 
 
 	QScopedPointer<Project> project_;
-
-	int pippo;
 
 	QScopedPointer<TaskPage> taskPage_;
 	QScopedPointer<ResourcePage> resourcePage_;

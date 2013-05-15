@@ -17,6 +17,9 @@ public:
 	virtual ~Page(){
 		delete table_;
 	}
+	inline void showGrid(bool show){
+		table_->setShowGrid(show);
+	}
 	
 public slots:
 	virtual void newItem()=0;

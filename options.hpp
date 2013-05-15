@@ -21,23 +21,32 @@ class Options: public QDialog
 public:
 	Options(MainWindow* parent = 0);
 
+	inline void setFirstDayOfWeek(Qt::DayOfWeek day) {
+		firstDayBox_->setCurrentIndex(day-1);
+	}
+
 	inline Qt::DayOfWeek getFirstDayOfWeek() const{
-		return Qt::DayOfWeek(1+firstDayOfWeek_->currentIndex());
+		return Qt::DayOfWeek(firstDayBox_->currentIndex()+1);
+	}
+
+	inline void setShowGrid(bool show) {
+		showGridBox_->setChecked(show);
 	}
 
 	inline bool getShowGrid() const{
-		return showGrid_->isChecked();
+		return showGridBox_->isChecked();
 	}
+
 
 private slots:
 	void closePanel(){
 		this->setVisible(false);
+		accept();
 	}
 
 private:
-	QComboBox* firstDayOfWeek_;
-	QCheckBox* showGrid_;
-
+	QComboBox* firstDayBox_;
+	QCheckBox* showGridBox_;
 };
 
 #endif // OPTIONS_HPP
